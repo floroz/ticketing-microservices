@@ -1,0 +1,13 @@
+{
+  "name": "ticketing",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "start": "pnpm -r exec --parallel --filter . -- pnpm start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
