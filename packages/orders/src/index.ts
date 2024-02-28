@@ -5,8 +5,8 @@ const port = 3001;
 
 app.use(express.json());
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello, World!');
+app.get('/api/orders', (req: Request, res: Response) => {
+  res.send('Hello, Orders!');
 });
 
 app.listen(port, () => {

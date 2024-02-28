@@ -5,8 +5,8 @@ const port = 3000;
 
 app.use(express.json());
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello, World!');
+app.get('/api/users/currentuser', (req: Request, res: Response) => {
+  res.send('Hello, Mars!!');
 });
 
 app.listen(port, () => {
