@@ -1,17 +1,22 @@
 import { ValidationError } from "express-validator";
-import { NormalizedErrorResponse } from "../types/errors";
+import { CustomError } from "./custom-error";
 
-export class RequestValidationError extends Error {
+export class RequestValidationError extends CustomError {
+  public statusCode: number = 400;
+
   constructor(private errors: ValidationError[]) {
-    super();
-
-    Object.setPrototypeOf(this, RequestValidationError.prototype);
+    super("Invalid request parameters");
   }
-  get normalizedResponse(): NormalizedErrorResponse {
-    return {errors: this.errors.map((error) =>
+
+  get normalizedResponse() {
+    const response =  {errors: this.errors.map((error) =>
       error.type === "field"
         ? { message: error.msg, field: error.path }
         : { message: error.msg }
-    )};
+    )
+    };
+    console.log("Response is: ", response)
+    return response;
   }
+
 }
