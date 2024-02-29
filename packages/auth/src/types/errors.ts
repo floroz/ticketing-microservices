@@ -1,4 +1,4 @@
-export type ErrorResponse = 
+export type NormalizedErrorResponse = 
   {
     errors: { message: string; field?: string }[];
   }

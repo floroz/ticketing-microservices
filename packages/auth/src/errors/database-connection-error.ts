@@ -7,4 +7,10 @@ export class DatabaseConnectionError extends Error {
 
     Object.setPrototypeOf(this, DatabaseConnectionError.prototype);
   }
+
+  get normalizedResponse() {
+    return {
+      errors: [{ message: this.reason }]
+    };
+  }
 }
