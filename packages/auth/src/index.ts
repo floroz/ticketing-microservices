@@ -19,7 +19,7 @@ app.use('/api/users', signinRouter);
 app.use('/api/users', signoutRouter);
 app.use('/api/users', signupRouter);
 
-app.get('*', () => { 
+app.use('*', () => { 
   throw new NotFoundError();
 });
 
