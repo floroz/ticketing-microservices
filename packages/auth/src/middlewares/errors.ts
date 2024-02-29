@@ -1,20 +1,27 @@
-import { Request, Response, NextFunction } from 'express';
-import { RequestValidationError } from '../errors/request-validation-errors';
-import { DatabaseConnectionError } from '../errors/database-connection-error';
+import { Request, Response, NextFunction } from "express";
+import { RequestValidationError } from "../errors/request-validation-errors";
+import { DatabaseConnectionError } from "../errors/database-connection-error";
+import { ErrorResponse } from "../types/errors";
 
-export const errorHandlerMiddlewere = (err: Error, req: Request, res: Response, next: NextFunction) => { 
+export const errorHandlerMiddlewere = (
+  err: Error,
+  _: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (err instanceof RequestValidationError) {
-     const formattedErrors = err.errors.map((error) => {
-      if (error.type === 'field') {
-        return { message: error.msg, field: error.path };
-      }
-    });
-    return res.status(400).send({ errors: formattedErrors });
+    const formattedErrors = err.errors.map((error) =>
+      error.type === "field"
+        ? { message: err.message, field: error.path }
+        : { message: error.msg }
+    );
+    return res.status(400).send({errors: formattedErrors } satisfies ErrorResponse);
   }
 
   if (err instanceof DatabaseConnectionError) {
-    return res.status(400).send({ errors: [err.message] });
+    const errorResponse: ErrorResponse = {errors: [{ message: err.reason }]};
+    return res.status(500).send(errorResponse);
   }
 
-  res.status(400).send({ errors: [err.message] });
-}
+  res.status(400).send({ errors: [{message: err.message}] } satisfies ErrorResponse);
+};
