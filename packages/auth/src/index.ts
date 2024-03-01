@@ -1,4 +1,5 @@
 import express from 'express';
+import cookieSession from 'cookie-session';
 import { currentUserRouter } from './routes/current-user';
 import { signinRouter } from './routes/signin';
 import { signoutRouter } from './routes/signout';
@@ -8,15 +9,31 @@ import { NotFoundError } from './errors/not-found-error';
 import mongoose from 'mongoose';
 import { DatabaseConnectionError } from './errors/database-connection-error';
 
+const port = 3000;
+
+if (process.env.JWT_SECRET == null) {
+  throw new Error('JWT_PRIVATE must be defined')
+} else {
+  console.log('JWT Secret loaded.')
+}
 
 const app = express();
-const port = 3000;
+
+// Trusting the ingress-nginx proxy
+app.set('trust proxy', true);
+
+app.use(cookieSession({
+  name: 'session',
+  signed: false,
+  // secure: true,
+}));
 
 app.use(express.json());
 
 app.get('/api/users/ping', (_, res) => {
   res.send('pong');
 });
+
 app.use('/api/users', currentUserRouter);
 app.use('/api/users', signinRouter);
 app.use('/api/users', signoutRouter);

@@ -1,10 +1,10 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { body, validationResult } from "express-validator";
-import { RequestValidationError } from "../errors/request-validation-errors";
+import { body } from "express-validator";
 import { DatabaseConnectionError } from "../errors/database-connection-error";
 import { User } from "../models/user";
 import { GenericError } from "../errors/generic-error";
 import { JWTService } from "../services/jwt";
+import { validateRequest } from "../middlewares/validate-request";
 
 const router = Router();
 
@@ -16,14 +16,9 @@ router.post(
       .trim()
       .isLength({ min: 4, max: 20 })
       .withMessage("Password must be between 4 and 20 characters"),
+   validateRequest,
   ],
   async (req: Request, res: Response, next: NextFunction) => {
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-      return next(new RequestValidationError(errors.array()));
-    }
-
     const { email, password } = req.body;
 
     // 1. check if user exits
@@ -41,20 +36,19 @@ router.post(
     // 2. create user
     // TODO: how to manage admin role creation?
     try {
-      const user = await User.build({ email, password }).save();
+      const userDoc = await User.build({ email, password }).save();
 
       const token = JWTService.generateToken({
-        id: user.id,
-        email: user.email,
-        role: user.role,
+        id: userDoc.id,
+        email: userDoc.email,
+        role: userDoc.role,
       });
 
-      res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV !== 'test',
-    });
+      req.session = {
+        token,
+      }
 
-      return res.status(201).send();
+      return res.status(201).send(userDoc);
     } catch (error) {
       console.log(error);
       return next(new DatabaseConnectionError());

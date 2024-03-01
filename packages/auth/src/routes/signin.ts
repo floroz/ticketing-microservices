@@ -1,9 +1,11 @@
 import { Request, Response, Router, NextFunction } from "express";
-import { body, validationResult } from "express-validator";
-import { RequestValidationError } from "../errors/request-validation-errors";
+import { body } from "express-validator";
+
 import { PasswordService } from "../services/password";
 import { User } from "../models/user";
 import { JWTService } from "../services/jwt";
+import { validateRequest } from "../middlewares/validate-request";
+import { GenericError } from "../errors/generic-error";
 
 const router = Router();
 
@@ -13,48 +15,42 @@ router.post(
     body("email").isEmail().withMessage("Email must be valid"),
     body("password")
       .trim()
+      .notEmpty()
       .isLength({ min: 4, max: 20 })
       .withMessage("Password must be between 4 and 20 characters"),
+    validateRequest,
   ],
   async (req: Request, res: Response, next: NextFunction) => {
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-      return next(new RequestValidationError(errors.array()));
-    }
-
     const { email, password } = req.body;
 
     // 1. check if user exits
     try {
-      const user = await User.findOne({ email });
+      const existingUserDoc = await User.findOne({ email });
 
-      if (!user) {
-        return res.status(400).send("Invalid email or password");
+      if (!existingUserDoc) {
+        return next(new GenericError("Invalid email or password"));
       }
 
-      // 2. check if passwords matche
+      // 2. check if passwords match
       const isSamePassword = await PasswordService.compare(
         password,
-        user.password
+        existingUserDoc.password
       );
 
       if (!isSamePassword) {
-        return res.status(400).send("Invalid email or password");
+        return next(new GenericError("Invalid email or password"));
       }
 
       const token = JWTService.generateToken({
-        id: user.id,
-        email: user.email,
-        role: user.role,
+        id: existingUserDoc.id,
+        email: existingUserDoc.email,
+        role: existingUserDoc.role,
       });
 
-      res.cookie("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV !== "test",
-      });
-
-      return res.status(200).send({ token });
+      req.session = {
+        token
+      }
+      return res.status(200).send(existingUserDoc);
     } catch (error) {
       return next(error);
     }
