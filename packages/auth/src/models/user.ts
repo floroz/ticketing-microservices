@@ -10,9 +10,10 @@ interface UserModel extends mongoose.Model<UserDoc> {
   build(payload: UserCreationPayload): UserDoc;
 }
 
-interface UserDoc extends mongoose.Document {
+export interface UserDoc extends mongoose.Document {
   email: string;
   password: string;
+  role: 'admin' | 'user';
 }
 
 const userSchema = new mongoose.Schema({
@@ -24,6 +25,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  role: {
+    type: String,
+    default: "user",
+  }
 });
 
 userSchema.statics.build = (payload: UserCreationPayload) => {
