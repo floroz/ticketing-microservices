@@ -4,7 +4,7 @@ import { body } from "express-validator";
 import { PasswordService } from "../services/password";
 import { User } from "../models/user";
 import { JWTService } from "../services/jwt";
-import { validateRequest } from "../middlewares/validate-request";
+import { validateRequestMiddleware } from "../middlewares/validate-request";
 import { GenericError } from "../errors/generic-error";
 
 const router = Router();
@@ -18,7 +18,7 @@ router.post(
       .notEmpty()
       .isLength({ min: 4, max: 20 })
       .withMessage("Password must be between 4 and 20 characters"),
-    validateRequest,
+    validateRequestMiddleware,
   ],
   async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;

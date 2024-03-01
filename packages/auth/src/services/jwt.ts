@@ -1,29 +1,30 @@
 import jwt from 'jsonwebtoken';
 import { UserDoc } from '../models/user';
 
-type TokenMetadata = Pick<UserDoc, 'id' | 'email' | 'role'>
+export type UserPayload = Pick<UserDoc, 'id' | 'email' | 'role'>
 
 export class JWTService {
 
-  static generateToken(metadata: TokenMetadata): string {
-    const token = jwt.sign(metadata, process.env.JWT_SECRET!, { expiresIn: '1h' })
+  static generateToken(userPayload: UserPayload): string {
+    const token = jwt.sign(userPayload, process.env.JWT_SECRET!, { expiresIn: '1h' })
     return token;
   }
 
-  static verifyToken(token: string): boolean {
+  static verify(token: string): UserPayload | null {
     try {
-      jwt.verify(token, process.env.JWT_SECRET!)
-      return true
+      const payload = jwt.verify(token, process.env.JWT_SECRET!)
+
+      if (!payload) {
+        return null
+      }
+
+      return payload as UserPayload;
     } catch (error) {
-      return false
+      return null
     }
   }
 
-  static decodeToken(token: string): TokenMetadata {
-    if (!this.verifyToken(token)) {
-      throw new Error('Invalid token')
-    }
-
-    return jwt.decode(token) as TokenMetadata
+  static decodeToken(token: string): UserPayload {
+    return jwt.decode(token) as UserPayload
   }
 }

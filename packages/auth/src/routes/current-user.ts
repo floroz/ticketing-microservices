@@ -1,39 +1,30 @@
-import { NextFunction, Request, Response, Router } from "express";
-import { JWTService } from "../services/jwt";
-import { User } from "../models/user";
-import { GenericError } from "../errors/generic-error";
+import { Request, Response, Router } from "express";
+import { authGuardMiddleware } from "../middlewares/auth-guard";
+import { UserPayload } from "../services/jwt";
+
+declare global {
+  namespace Express {
+    interface Request {
+      currentUser?: UserPayload;
+    }
+  }
+}
 
 const router = Router();
 
 router.get(
   "/current-user",
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { token } = req.session ?? {};
+  [authGuardMiddleware],
+  async (req: Request, res: Response) => {
+    const { currentUser } = req
 
-    console.log("session", req.session);
-
-    if (!token) {
-      return res.send({ currentUser: null });
+    if (!currentUser) {
+      return res.status(200).send({currentUser: null});
     }
 
-    try {
-      if (!JWTService.verifyToken(token)) {
-        return res.send({ currentUser: null });
-      }
-
-      const user = JWTService.decodeToken(token);
-
-      const userDoc = await User.findOne({ email: user.email });
-
-      if (!userDoc) { 
-        throw new GenericError('User not found');
-      }
-
-      return res.send(userDoc);
-    } catch (error) {
-      console.log(error);
-      return next(error);
-    }
+    return res.status(200).send({
+      currentUser
+    });
   }
 );
 
