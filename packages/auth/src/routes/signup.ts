@@ -4,7 +4,6 @@ import { RequestValidationError } from "../errors/request-validation-errors";
 import { DatabaseConnectionError } from "../errors/database-connection-error";
 import { User } from "../models/user";
 import { GenericError } from "../errors/generic-error";
-import { PasswordService } from "../services/password";
 
 const router = Router();
 
@@ -40,21 +39,11 @@ router.post(
       return next(new DatabaseConnectionError());
     }
 
-    // 2. hash the password
-    let hashedPassword: string = '';
-
+    // 2. create user
     try {
-     hashedPassword = await PasswordService.hash(password);
-    } catch (err) {
-      console.log(err);
-      return next(new GenericError('Error in generating hashed password'));
-    }
-
-    // 3. create user
-    try {
-      const user = await User.build({ email, password: hashedPassword }).save();
+      const user = await User.build({ email, password }).save();
       // return a valid jwt/cookie
-      return res.status(201).send({});
+      return res.status(201).send({user});
     } catch (error) {
       console.log(error);
       throw new DatabaseConnectionError();
