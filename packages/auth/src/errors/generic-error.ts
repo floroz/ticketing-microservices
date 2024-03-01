@@ -1,10 +1,9 @@
 import { NormalizedErrorResponse } from "../types/errors";
+import { CustomError } from "./custom-error";
 
-export class GenericError extends Error {
-  constructor(message: string) {
+export class GenericError extends CustomError {
+  constructor(message: string, public statusCode: number = 400) {
     super(message);
-
-    Object.setPrototypeOf(this, GenericError.prototype);
   }
 
   get normalizedResponse(): NormalizedErrorResponse {

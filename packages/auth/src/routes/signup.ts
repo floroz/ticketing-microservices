@@ -2,6 +2,9 @@ import { Router, Request, Response, NextFunction } from "express";
 import { body, validationResult } from "express-validator";
 import { RequestValidationError } from "../errors/request-validation-errors";
 import { DatabaseConnectionError } from "../errors/database-connection-error";
+import { User } from "../models/user";
+import { GenericError } from "../errors/generic-error";
+import { PasswordService } from "../services/password";
 
 const router = Router();
 
@@ -10,13 +13,11 @@ router.post(
   [
     body("email")
       .isEmail()
-      .withMessage("Email must be valid")
-      .escape(),
+      .withMessage("Email must be valid"),
     body("password")
       .trim()
       .isLength({ min: 4, max: 20 })
       .withMessage("Password must be between 4 and 20 characters")
-      .escape(),
   ],
   async (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
@@ -27,8 +28,39 @@ router.post(
 
     const { email, password } = req.body;
 
-    console.log("Creating a user...");
-    return next(new DatabaseConnectionError());
+    // 1. check if user exits
+    try {
+      const existing = await User.findOne({ email });
+
+      if (existing) {
+        return next(new GenericError('Invalid email or password'));
+      }
+    } catch (error) {
+      console.log(error);
+      return next(new DatabaseConnectionError());
+    }
+
+    // 2. hash the password
+    let hashedPassword: string = '';
+
+    try {
+     hashedPassword = await PasswordService.hash(password);
+    } catch (err) {
+      console.log(err);
+      return next(new GenericError('Error in generating hashed password'));
+    }
+
+    // 3. create user
+    try {
+      const user = await User.build({ email, password: hashedPassword }).save();
+      // return a valid jwt/cookie
+      return res.status(201).send({});
+    } catch (error) {
+      console.log(error);
+      throw new DatabaseConnectionError();
+    }
+
+
   }
 );
 

@@ -12,5 +12,6 @@ export const errorHandlerMiddlewere = (
     return res.status(err.statusCode).send(err.normalizedResponse);
   }
 
-  return res.status(400).send(new GenericError(err.message ?? "Something went wrong").normalizedResponse);
+
+  return res.status(400).send(new GenericError('Something went wrong').normalizedResponse);
 };
