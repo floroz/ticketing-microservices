@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node-dev --poll src/index.ts",
-    "test": "JWT_SECRET=test vitest run"
+    "test": "JWT_SECRET=test vitest"
   },
   "keywords": [],
   "author": "",
