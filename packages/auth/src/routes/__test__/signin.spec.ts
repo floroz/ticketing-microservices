@@ -2,19 +2,27 @@ import { it, expect, describe } from "vitest";
 import request from "supertest";
 import { app } from "../../app";
 
-const ROUTE = "/api/users/signup";
+const ROUTE = "/api/users/signin";
 const email = "test@test.com";
 const password = "password";
 
-describe("Signup Route", () => {
-  it("should return a 201 on successful signup", async () => {
+describe("Signin Route", () => {
+  it("should return a 200 on successful login", async () => {
+    await request(app)
+      .post('/api/users/signup')
+      .send({
+        email,
+        password,
+      })
+      .expect(201);
+    
     const response = await request(app)
       .post(ROUTE)
       .send({
         email,
         password,
       })
-      .expect(201);
+      .expect(200);
 
     expect(response.body.email).toBe(email);
     expect(response.body.id).toBeTypeOf("string");
@@ -56,36 +64,22 @@ describe("Signup Route", () => {
     );
   });
 
-  it("should not allow duplicate emails", async () => {
-    // Create a user with the same email
-    await request(app)
-      .post(ROUTE)
-      .send({
-        email,
-        password,
-      })
-      .expect(201);
-
-    // Try to create another user with the same email
-    const response = await request(app)
-      .post(ROUTE)
-      .send({
-        email,
-        password,
-      })
-      .expect(400);
-
-    expect(response.body.errors[0].message).toBe("Email already in use");
-  });
-
   it("should set a cookie after successful signup", async () => {
+      await request(app)
+      .post('/api/users/signup')
+      .send({
+        email,
+        password,
+      })
+      .expect(201);
+
     const response = await request(app)
       .post(ROUTE)
       .send({
         email,
         password,
       })
-      .expect(201);
+      .expect(200);
 
     expect(response.get("Set-Cookie")).toBeDefined();
     expect(response.get("Set-Cookie")[0]).toContain("session=");

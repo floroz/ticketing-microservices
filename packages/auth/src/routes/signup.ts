@@ -26,7 +26,7 @@ router.post(
       const existing = await User.findOne({ email });
 
       if (existing) {
-        return next(new GenericError("Invalid email or password"));
+        return next(new GenericError("Email already in use"));
       }
     } catch (error) {
       console.log(error);

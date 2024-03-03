@@ -1,7 +1,15 @@
 import { Request, Response, NextFunction } from "express";
-import { JWTService } from "../services/jwt";
+import { JWTService, UserPayload } from "../services/jwt";
 import { User } from "../models/user";
 import { UnauthorizedError } from "../errors/unauthorized-error";
+
+declare global {
+  namespace Express {
+    interface Request {
+      currentUser?: UserPayload;
+    }
+  }
+}
 
 export const authGuardMiddleware = async (
   req: Request,

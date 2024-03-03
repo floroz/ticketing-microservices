@@ -7,8 +7,6 @@ let mongo: MongoMemoryServer | null = null;
 beforeAll(async () => {
   mongo = await MongoMemoryServer.create();
   const mongoUri = mongo.getUri();
-  console.log("MongoMemory URI: ", mongoUri);
-
   await mongoose.connect(mongoUri, {});
 });
 

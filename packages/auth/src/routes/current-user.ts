@@ -1,30 +1,35 @@
 import { Request, Response, Router } from "express";
-import { authGuardMiddleware } from "../middlewares/auth-guard";
-import { UserPayload } from "../services/jwt";
+import { JWTService } from "../services/jwt";
+import { User } from "../models/user";
 
-declare global {
-  namespace Express {
-    interface Request {
-      currentUser?: UserPayload;
-    }
-  }
-}
 
 const router = Router();
 
 router.get(
   "/current-user",
-  [authGuardMiddleware],
   async (req: Request, res: Response) => {
-    const { currentUser } = req
+    const { token } = req.session ?? {};
 
-    if (!currentUser) {
-      return res.status(200).send({currentUser: null});
+    if (!token) {
+      return res.status(200).send({ currentUser: null });
     }
 
-    return res.status(200).send({
-      currentUser
-    });
+    const payload = JWTService.verify(token);
+
+    if (!payload) {
+      console.log("Invalid token")
+      req.session = null;
+       return res.status(200).send({ currentUser: null });
+    }
+
+    const userDoc = await User.findOne({ email: payload.email });
+
+    if (!userDoc) {
+      return res.status(200).send({ currentUser: null });
+    }
+
+
+    return res.status(200).send({ currentUser: userDoc ?? null });
   }
 );
 
