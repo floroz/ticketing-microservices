@@ -3,7 +3,6 @@
 
 import { useUser } from "@/context/user";
 import Signup from "@/features/signup";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 const SignupPage = () => {
@@ -17,9 +16,6 @@ const SignupPage = () => {
     <div>
       <h1>Signup</h1>
       <Signup />
-      <Link href="/signin">
-        Signin
-      </Link>
     </div>
   );
 }
