@@ -7,8 +7,11 @@ import { signoutRouter } from './routes/signout';
 import { signupRouter } from './routes/signup';
 import { errorHandlerMiddlewere } from './middlewares/errors';
 import { NotFoundError } from './errors/not-found-error';
+import morgan from 'morgan';
 
 const app = express();
+
+app.use(morgan('dev'));
 
 // Trusting the ingress-nginx proxy
 app.set('trust proxy', true);
