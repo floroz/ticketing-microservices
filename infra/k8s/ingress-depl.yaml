@@ -30,4 +30,4 @@ spec:
               service:
                 name: client-srv
                 port:
-                  number: 4000
+                  number: 3000
