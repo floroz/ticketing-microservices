@@ -19,18 +19,20 @@ export const UserProvider = ({ children }: React.PropsWithChildren) => {
   const [loading, setLoading] = useState(true);
 
   useLayoutEffect(() => {
-    (async function getCurrentUser() {
+    async function getCurrentUser() {
       try {
-        const response = await fetch('/api/users/current-user');
-        const { currentUser } = await response.json();
-        console.log('initialUser: ', currentUser);
-        setUser(currentUser ?? null);
+        const res = await fetch('/api/users/current-user')
+        const { currentUser } = await res.json()
+        console.log('initialUser: ', currentUser)
+        setUser(currentUser ?? null)
       } catch (error) {
-        console.error(error);
+
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    })()
+    }
+
+    getCurrentUser()
   }, [])
 
   const contextValue = useMemo(() => ({ user, setUser }), [user, setUser])

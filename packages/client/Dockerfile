@@ -1,4 +1,4 @@
-FROM node:alpine
+FROM node:lts-alpine
 # Set the working directory inside the container
 WORKDIR /app
 # Copy package.json and package-lock.json to the working directory
