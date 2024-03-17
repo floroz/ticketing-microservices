@@ -11,7 +11,7 @@ importers:
   packages/auth:
     dependencies:
       '@ticketing/common':
-        specifier: workspace:*
+        specifier: 1.0.1
         version: link:../common
       '@types/bcrypt':
         specifier: ^5.0.2
