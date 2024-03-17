@@ -1,11 +1,11 @@
 import { Request, Response, Router, NextFunction } from "express";
 import { body } from "express-validator";
 
-import { PasswordService } from "../services/password";
-import { User } from "../models/user";
-import { JWTService } from "../services/jwt";
-import { validateRequestMiddleware } from "../middlewares/validate-request";
-import { GenericError } from "../errors/generic-error";
+import { PasswordService } from "@ticketing/common";
+import { User } from "@ticketing/common";
+import { validateRequestMiddleware } from "@ticketing/common";
+import { GenericError } from "@ticketing/common";
+import { jwtService } from "../services/jwt";
 
 const router = Router();
 
@@ -40,7 +40,7 @@ router.post(
         return next(new GenericError("Invalid email or password"));
       }
 
-      const token = JWTService.generateToken({
+      const token = jwtService.generateToken({
         id: existingUserDoc.id,
         email: existingUserDoc.email,
         role: existingUserDoc.role,

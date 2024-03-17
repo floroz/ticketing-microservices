@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { JWTService, UserPayload } from "../services/jwt";
+import { type JWTService, UserPayload } from "../services/jwt";
 import { User } from "../models/user";
 import { UnauthorizedError } from "../errors/unauthorized-error";
 
@@ -11,7 +11,7 @@ declare global {
   }
 }
 
-export const authGuardMiddleware = async (
+export const authGuardMiddleware = (jwtService: JWTService) => async (
   req: Request,
   _res: Response,
   next: NextFunction
@@ -26,7 +26,7 @@ export const authGuardMiddleware = async (
     }
 
     // verify JWT signature
-    const payload = JWTService.verify(token);
+    const payload = jwtService.verify(token);
     if (!payload) {
       console.log("Invalid token")
       req.session = null;

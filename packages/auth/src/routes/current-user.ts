@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express";
-import { JWTService } from "../services/jwt";
-import { User } from "../models/user";
+import { User } from "@ticketing/common";
+import { jwtService } from "../services/jwt";
 
 
 const router = Router();
@@ -14,7 +14,7 @@ router.get(
       return res.status(200).send({ currentUser: null });
     }
 
-    const payload = JWTService.verify(token);
+    const payload = jwtService.verify(token);
 
     if (!payload) {
       console.log("Invalid token")

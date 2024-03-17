@@ -1,12 +1,13 @@
 
 import express from 'express';
 import cookieSession from 'cookie-session';
+import { errorHandlerMiddlewere } from '@ticketing/common';
+import { NotFoundError } from '@ticketing/common';
 import { currentUserRouter } from './routes/current-user';
 import { signinRouter } from './routes/signin';
 import { signoutRouter } from './routes/signout';
 import { signupRouter } from './routes/signup';
-import { errorHandlerMiddlewere } from './middlewares/errors';
-import { NotFoundError } from './errors/not-found-error';
+
 import morgan from 'morgan';
 
 const app = express();

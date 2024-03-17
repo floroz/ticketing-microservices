@@ -1,10 +1,10 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { body } from "express-validator";
-import { DatabaseConnectionError } from "../errors/database-connection-error";
-import { User } from "../models/user";
-import { GenericError } from "../errors/generic-error";
-import { JWTService } from "../services/jwt";
-import { validateRequestMiddleware } from "../middlewares/validate-request";
+import { DatabaseConnectionError } from "@ticketing/common";
+import { User } from "@ticketing/common";
+import { GenericError } from "@ticketing/common";
+import { validateRequestMiddleware } from "@ticketing/common";
+import { jwtService } from "../services/jwt";
 
 const router = Router();
 
@@ -38,7 +38,7 @@ router.post(
     try {
       const userDoc = await User.build({ email, password }).save();
 
-      const token = JWTService.generateToken({
+      const token = jwtService.generateToken({
         id: userDoc.id,
         email: userDoc.email,
         role: userDoc.role,

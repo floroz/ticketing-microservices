@@ -1,30 +1,6 @@
-import jwt from 'jsonwebtoken';
-import { UserDoc } from '../models/user';
+import { JWTService } from '@ticketing/common';
 
-export type UserPayload = Pick<UserDoc, 'id' | 'email' | 'role'>
+const jwtService = new JWTService(process.env.JWT_SECRET!);
 
-export class JWTService {
-
-  static generateToken(userPayload: UserPayload): string {
-    const token = jwt.sign(userPayload, process.env.JWT_SECRET!, { expiresIn: '1h' })
-    return token;
-  }
-
-  static verify(token: string): UserPayload | null {
-    try {
-      const payload = jwt.verify(token, process.env.JWT_SECRET!)
-
-      if (!payload) {
-        return null
-      }
-
-      return payload as UserPayload;
-    } catch (error) {
-      return null
-    }
-  }
-
-  static decodeToken(token: string): UserPayload {
-    return jwt.decode(token) as UserPayload
-  }
-}
+// Express doesn't have a DI mechanism in place, so we instantiate the singleton here and make it available through the app via module system
+export { jwtService };
