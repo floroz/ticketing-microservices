@@ -1,6 +1,6 @@
 
 import mongoose from 'mongoose';
-import { DatabaseConnectionError } from '@ticketing/common';
+import { DatabaseConnectionError } from 'floroz-ticketing-common';
 
 import { app } from './app';
 

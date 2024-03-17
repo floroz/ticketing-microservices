@@ -1,4 +1,4 @@
-import { JWTService } from '@ticketing/common';
+import { JWTService } from 'floroz-ticketing-common';
 
 const jwtService = new JWTService(process.env.JWT_SECRET!);
 

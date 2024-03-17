@@ -1,9 +1,9 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { body } from "express-validator";
-import { DatabaseConnectionError } from "@ticketing/common";
-import { User } from "@ticketing/common";
-import { GenericError } from "@ticketing/common";
-import { validateRequestMiddleware } from "@ticketing/common";
+import { DatabaseConnectionError } from "floroz-ticketing-common";
+import { User } from "floroz-ticketing-common";
+import { GenericError } from "floroz-ticketing-common";
+import { validateRequestMiddleware } from "floroz-ticketing-common";
 import { jwtService } from "../services/jwt";
 
 const router = Router();

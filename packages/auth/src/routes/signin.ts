@@ -1,10 +1,10 @@
 import { Request, Response, Router, NextFunction } from "express";
 import { body } from "express-validator";
 
-import { PasswordService } from "@ticketing/common";
-import { User } from "@ticketing/common";
-import { validateRequestMiddleware } from "@ticketing/common";
-import { GenericError } from "@ticketing/common";
+import { PasswordService } from "floroz-ticketing-common";
+import { User } from "floroz-ticketing-common";
+import { validateRequestMiddleware } from "floroz-ticketing-common";
+import { GenericError } from "floroz-ticketing-common";
 import { jwtService } from "../services/jwt";
 
 const router = Router();

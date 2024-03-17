@@ -1,8 +1,8 @@
 
 import express from 'express';
 import cookieSession from 'cookie-session';
-import { errorHandlerMiddlewere } from '@ticketing/common';
-import { NotFoundError } from '@ticketing/common';
+import { errorHandlerMiddlewere } from 'floroz-ticketing-common';
+import { NotFoundError } from 'floroz-ticketing-common';
 import { currentUserRouter } from './routes/current-user';
 import { signinRouter } from './routes/signin';
 import { signoutRouter } from './routes/signout';

@@ -1,5 +1,5 @@
 import { Request, Response, Router } from "express";
-import { User } from "@ticketing/common";
+import { User } from "floroz-ticketing-common";
 import { jwtService } from "../services/jwt";
 
 
