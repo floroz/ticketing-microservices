@@ -1,6 +1,6 @@
 {
   "name": "@ticketing/common",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "dist/index.js",
   "type": "commonjs",
@@ -9,6 +9,10 @@
     "build": "tsc"
   },
   "keywords": [],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
