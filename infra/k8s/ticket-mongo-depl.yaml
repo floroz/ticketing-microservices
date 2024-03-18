@@ -1,31 +1,30 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: orders-depl
+  name: ticket-mongo-depl
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: orders
+      app: ticket-mongo
   template:
     metadata:
       labels:
-        app: orders
+        app: ticket-mongo
     spec:
       containers:
-        - name: orders
-          image: floroz/orders
+        - name: ticket-mongo
+          image: mongo
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: orders-srv
+  name: ticket-mongo-srv
 spec:
   selector:
-    app: orders
+    app: ticket-mongo
   ports:
-    - name: orders
+    - name: db
       protocol: TCP
-      port: 3002
-      targetPort: 3002
-
+      port: 27017
+      targetPort: 27017
