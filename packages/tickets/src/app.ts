@@ -25,7 +25,7 @@ app.use(
 
 app.use(express.json());
 
-app.use("api/tickets", router);
+app.use("/api/tickets", router);
 
 app.use("*", () => {
   throw new NotFoundError();

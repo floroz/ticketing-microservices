@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ticket-depl
+  name: tickets-depl
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ticket
+      app: tickets
   template:
     metadata:
       labels:
-        app: ticket
+        app: tickets
     spec:
       containers:
-        - name: ticket
-          image: floroz/ticket
+        - name: tickets
+          image: floroz/tickets
           env:
             - name: JWT_SECRET
               valueFrom:
@@ -22,17 +22,17 @@ spec:
                   name: jwt-secret
                   key: JWT_SECRET
             - name: MONGO_URI
-              value: 'mongodb://ticket-mongo-srv:27017/tickets'
+              value: 'mongodb://tickets-mongo-srv:27017/tickets'
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: ticket-srv
+  name: tickets-srv
 spec:
   selector:
-    app: ticket
+    app: tickets
   ports:
-    - name: ticket
+    - name: tickets
       protocol: TCP
       port: 3001
       targetPort: 3001

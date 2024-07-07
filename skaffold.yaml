@@ -6,7 +6,7 @@ build:
       context: packages/client
       sync:
         manual:
-          - src: src/**/*
+          - src: src/**/!(*.test).ts
             dest: .
       docker:
         dockerfile: Dockerfile
@@ -14,7 +14,7 @@ build:
       context: packages/auth
       sync:
         manual:
-          - src: src/**/*.ts
+          - src: src/**/!(*.test).ts
             dest: .
       docker:
         dockerfile: Dockerfile
@@ -22,7 +22,15 @@ build:
       context: packages/orders
       sync:
         manual:
-          - src: src/**/*.ts
+          - src: src/**/!(*.test).ts
+            dest: .
+      docker:
+        dockerfile: Dockerfile
+    - image: floroz/tickets
+      context: packages/tickets
+      sync:
+        manual:
+          - src: src/**/!(*.test).ts
             dest: .
       docker:
         dockerfile: Dockerfile

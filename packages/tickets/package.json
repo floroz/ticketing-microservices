@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node-dev --poll src/index.ts"
+    "start": "ts-node-dev --poll --ignore-watch **/*.test.ts src/index.ts",
+    "test": "JWT_SECRET=test vitest"
   },
   "keywords": [],
   "author": "",
