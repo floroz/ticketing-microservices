@@ -9,9 +9,11 @@ export const errorHandlerMiddlewere = (
   _next: NextFunction
 ) => {
   if (err instanceof CustomError) {
+    console.log("Custom error", err);
     return res.status(err.statusCode).send(err.normalizedResponse);
   }
 
-
-  return res.status(400).send(new GenericError('Something went wrong').normalizedResponse);
+  console.log("Generic Error - 500");
+  const error = new GenericError("Something went wrong", 500);
+  return res.status(error.statusCode).send(error.normalizedResponse);
 };
