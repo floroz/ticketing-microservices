@@ -41,8 +41,8 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1
       floroz-ticketing-common:
-        specifier: 1.0.9
-        version: 1.0.9(@types/node@20.11.28)
+        specifier: latest
+        version: 1.0.10(@types/node@20.11.28)
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
@@ -182,8 +182,8 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1
       floroz-ticketing-common:
-        specifier: 1.0.9
-        version: 1.0.9(@types/node@20.11.28)
+        specifier: latest
+        version: 1.0.10(@types/node@20.11.28)
       mongoose:
         specifier: ^8.2.2
         version: 8.2.2
@@ -227,8 +227,8 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1
       floroz-ticketing-common:
-        specifier: 1.0.9
-        version: 1.0.9(@types/node@20.11.28)
+        specifier: latest
+        version: 1.0.10(@types/node@20.11.28)
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
@@ -2676,8 +2676,8 @@ packages:
     resolution: {integrity: sha512-X8cqMLLie7KsNUDSdzeN8FYK9rEt4Dt67OsG/DNGnYTSDBG4uFAJFBnUeiV+zCVAvwFy56IjM9sH51jVaEhNxw==}
     dev: true
 
-  /floroz-ticketing-common@1.0.9(@types/node@20.11.28):
-    resolution: {integrity: sha512-blqrRHf6GCv+6svQhNIXZHEBJjX4HE5bZRxT/y52JaP0KuiLkAdX/fd52a+js/pyDskYhmOu3lw1Y6ZSCuY60w==}
+  /floroz-ticketing-common@1.0.10(@types/node@20.11.28):
+    resolution: {integrity: sha512-98hGfgIHAPVXiY5BwH7KEeY9Vtwhxv/e0UWEIzZZQNaUQMTcqPHRcdlJM+lYt1aQAY9B2sSkaGDMoVti0lq1Cg==}
     dependencies:
       '@types/bcrypt': 5.0.2
       '@types/cookie-session': 2.0.48
