@@ -1,5 +1,4 @@
 export { DatabaseConnectionError } from "./errors/database-connection-error";
-export { authGuardMiddleware } from "./middlewares/auth-guard";
 export { CustomError } from "./errors/custom-error";
 export { errorHandlerMiddlewere } from "./middlewares/errors";
 export { GenericError } from "./errors/generic-error";
