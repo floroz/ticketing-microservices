@@ -11,5 +11,6 @@ export { UnauthorizedError } from "./errors/unauthorized-error";
 export { User } from "./models/user";
 export { UserPayload } from "./services/jwt";
 export { validateRequestMiddleware } from "./middlewares/validate-request";
-export * from './types/errors'
-
+export { currentUserMiddleware } from "./middlewares/current-user";
+export { requireAuth } from "./middlewares/require-auth";
+export * from "./types/errors";
