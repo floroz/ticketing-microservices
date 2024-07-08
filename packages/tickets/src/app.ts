@@ -7,6 +7,7 @@ import {
   errorHandlerMiddlewere,
 } from "floroz-ticketing-common";
 import { createRouter } from "./routes/tickets";
+import { jwtService } from "./services/jwt";
 
 const app = express();
 
@@ -25,7 +26,7 @@ app.use(
 
 app.use(express.json());
 
-app.use("/api/tickets", createRouter(new JWTService(process.env.JWT_SECRET!)));
+app.use("/api/tickets", createRouter(jwtService));
 
 app.use("*", () => {
   throw new NotFoundError();

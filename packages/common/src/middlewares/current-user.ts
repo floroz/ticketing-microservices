@@ -15,7 +15,9 @@ const currentUserMiddleware = (jwtService: JWTService) => {
     const { token } = req.session ?? {};
 
     if (!token) {
-      return res.status(200).send({ currentUser: null });
+      req.session = null;
+      req.currentUser = undefined;
+      return next();
     }
 
     const payload = jwtService.verify(token);

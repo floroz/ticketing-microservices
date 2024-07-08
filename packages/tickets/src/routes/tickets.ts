@@ -1,5 +1,9 @@
 import { Router, Request, Response } from "express";
-import { JWTService, authGuardMiddleware } from "floroz-ticketing-common";
+import {
+  JWTService,
+  currentUserMiddleware,
+  requireAuth,
+} from "floroz-ticketing-common";
 
 function createRouter(jwtService: JWTService) {
   const router = Router();
@@ -14,7 +18,8 @@ function createRouter(jwtService: JWTService) {
 
   router.post(
     "/",
-    authGuardMiddleware(jwtService),
+    currentUserMiddleware(jwtService),
+    requireAuth(),
     (req: Request, res: Response) => {
       res.status(201).json({});
     }
@@ -22,7 +27,8 @@ function createRouter(jwtService: JWTService) {
 
   router.put(
     "/:id",
-    authGuardMiddleware(jwtService),
+    currentUserMiddleware(jwtService),
+    requireAuth(),
     (req: Request, res: Response) => {
       res.status(200).json({});
     }
