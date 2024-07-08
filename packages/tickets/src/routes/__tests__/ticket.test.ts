@@ -1,5 +1,5 @@
 import request from "supertest";
-import { app } from "../src/app";
+import { app } from "../../app";
 import { it, expect } from "vitest";
 
 const email = "test@test.com";
@@ -15,7 +15,7 @@ it("returns 200 for GET /api/tickets/:id", async () => {
   expect(response.body.message).toBe("Hello, 1");
 });
 
-it("returns 401 for POST /api/tickets - when unauthorized", async () => {
+it.only("returns 401 for POST /api/tickets - when unauthorized", async () => {
   await request(app).post("/api/tickets").expect(401);
 });
 

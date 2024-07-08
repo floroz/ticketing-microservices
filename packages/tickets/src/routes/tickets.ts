@@ -19,7 +19,7 @@ function createRouter(jwtService: JWTService) {
   router.post(
     "/",
     currentUserMiddleware(jwtService),
-    // requireAuth(),
+    requireAuth(),
     (req: Request, res: Response) => {
       res.status(201).json({});
     }
