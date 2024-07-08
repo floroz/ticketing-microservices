@@ -14,8 +14,10 @@ const main = async () => {
   if (!process.env.MONGO_URI) {
     throw new Error("MONGO_URI must be defined");
   }
+
+  let mongo: typeof mongoose | null = null;
   try {
-    const m = await mongoose.connect(process.env.MONGO_URI);
+    mongo = await mongoose.connect(process.env.MONGO_URI);
     console.log("Connected to MongoDB");
   } catch (error) {
     console.error(error);
@@ -24,6 +26,14 @@ const main = async () => {
 
   app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
+  });
+
+  process.on("beforeExit", async () => {
+    if (mongo) {
+      await mongo.disconnect();
+      console.log("Disconnected from MongoDB");
+      await mongoose.connection.close();
+    }
   });
 };
 

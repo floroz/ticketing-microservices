@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node-dev --poll --ignore-watch **/*.test.ts src/index.ts",
+    "start": "ts-node-dev --poll src/index.ts",
     "test": "JWT_SECRET=test vitest"
   },
   "keywords": [],
@@ -21,7 +21,7 @@
     "cookie-session": "^2.1.0",
     "express": "^4.18.3",
     "express-validator": "^7.0.1",
-    "floroz-ticketing-common": "latest",
+    "floroz-ticketing-common": "1.0.13",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.2.2",
     "morgan": "^1.10.0",

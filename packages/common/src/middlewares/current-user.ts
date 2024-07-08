@@ -1,44 +1,30 @@
 import { NextFunction, Request, Response } from "express";
 import { JWTService, UserPayload } from "../services/jwt";
-import { User } from "../models/user";
+import { GenericError } from "../errors/generic-error";
 
 declare global {
   namespace Express {
     interface Request {
-      currentUser?: UserPayload;
+      currentUser: UserPayload | null;
     }
   }
 }
 
 const currentUserMiddleware = (jwtService: JWTService) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    const { token } = req.session ?? {};
-
-    if (!token) {
-      req.session = null;
-      req.currentUser = undefined;
+  return async (req: Request, _: Response, next: NextFunction) => {
+    if (!req.session?.token) {
+      console.log("No token found in the session");
       return next();
     }
 
-    const payload = jwtService.verify(token);
-
-    if (!payload) {
-      console.log("Invalid token");
-      req.session = null;
-      req.currentUser = undefined;
-      return next();
+    try {
+      const payload = jwtService.verify(req.session.token);
+      req.currentUser = payload;
+    } catch (err) {
+      return next(new GenericError("Something went wrong", 500));
     }
 
-    const userDoc = await User.findOne({ email: payload.email });
-
-    if (!userDoc) {
-      req.session = null;
-      req.currentUser = undefined;
-      return next();
-    }
-
-    req.currentUser = userDoc;
-    return next();
+    next();
   };
 };
 
