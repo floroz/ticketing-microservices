@@ -41,8 +41,8 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1
       floroz-ticketing-common:
-        specifier: 1.0.5
-        version: 1.0.5(@types/node@20.11.28)
+        specifier: 1.0.8
+        version: 1.0.8(@types/node@20.11.28)
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
@@ -182,8 +182,8 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1
       floroz-ticketing-common:
-        specifier: 1.0.5
-        version: 1.0.5(@types/node@20.11.28)
+        specifier: 1.0.8
+        version: 1.0.8(@types/node@20.11.28)
       mongoose:
         specifier: ^8.2.2
         version: 8.2.2
@@ -227,8 +227,8 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1
       floroz-ticketing-common:
-        specifier: 1.0.7
-        version: 1.0.7(@types/node@20.11.28)
+        specifier: 1.0.8
+        version: 1.0.8(@types/node@20.11.28)
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
@@ -2676,42 +2676,8 @@ packages:
     resolution: {integrity: sha512-X8cqMLLie7KsNUDSdzeN8FYK9rEt4Dt67OsG/DNGnYTSDBG4uFAJFBnUeiV+zCVAvwFy56IjM9sH51jVaEhNxw==}
     dev: true
 
-  /floroz-ticketing-common@1.0.5(@types/node@20.11.28):
-    resolution: {integrity: sha512-DRgEGz6ME5Hd1oBBOX6La0a3vU6gFeweb5azQTJYM0X5YF7KshCk68Aw/3b9b1A8ZMyTFmlJj97xrx3mpAeaJw==}
-    dependencies:
-      '@types/bcrypt': 5.0.2
-      '@types/cookie-session': 2.0.48
-      '@types/express': 4.17.21
-      '@types/express-validator': 3.0.0
-      '@types/jsonwebtoken': 9.0.6
-      '@types/morgan': 1.9.9
-      bcrypt: 5.1.1
-      cookie-session: 2.1.0
-      express: 4.18.3
-      express-validator: 7.0.1
-      jsonwebtoken: 9.0.2
-      mongoose: 8.2.2
-      morgan: 1.10.0
-      ts-node-dev: 2.0.0(@types/node@20.11.28)(typescript@5.4.2)
-      typescript: 5.4.2
-    transitivePeerDependencies:
-      - '@aws-sdk/credential-providers'
-      - '@mongodb-js/zstd'
-      - '@swc/core'
-      - '@swc/wasm'
-      - '@types/node'
-      - encoding
-      - gcp-metadata
-      - kerberos
-      - mongodb-client-encryption
-      - node-notifier
-      - snappy
-      - socks
-      - supports-color
-    dev: false
-
-  /floroz-ticketing-common@1.0.7(@types/node@20.11.28):
-    resolution: {integrity: sha512-bNc9DVUWVNqQtqr2ciyeHcMIdwjtM+3QLihU8TzGGoitjkPnqwCOn8NXSrM33Aec5FjXed7541iZjk0AKPA3dQ==}
+  /floroz-ticketing-common@1.0.8(@types/node@20.11.28):
+    resolution: {integrity: sha512-nIhtLj6aHktvscDFkCEWyRH+2DpHw3vtFXMZM6XAUUMlKnuF0wEzPF2fA4+SYT9s8xJxypbOuTAaioEJ/M7x1w==}
     dependencies:
       '@types/bcrypt': 5.0.2
       '@types/cookie-session': 2.0.48
