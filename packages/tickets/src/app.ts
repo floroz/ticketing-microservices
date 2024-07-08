@@ -2,11 +2,11 @@ import express, { Request, Response } from "express";
 import cookieSession from "cookie-session";
 import morgan from "morgan";
 import {
+  JWTService,
   NotFoundError,
-  authGuardMiddleware,
   errorHandlerMiddlewere,
 } from "floroz-ticketing-common";
-import { router } from "../routes/tickets";
+import { createRouter } from "./routes/tickets";
 
 const app = express();
 
@@ -25,7 +25,7 @@ app.use(
 
 app.use(express.json());
 
-app.use("/api/tickets", router);
+app.use("/api/tickets", createRouter(new JWTService(process.env.JWT_SECRET!)));
 
 app.use("*", () => {
   throw new NotFoundError();
