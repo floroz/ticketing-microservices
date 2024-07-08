@@ -6,7 +6,7 @@ build:
       context: packages/client
       sync:
         manual:
-          - src: src/**/!(*.test).ts
+          - src: src/**/*.ts
             dest: .
       docker:
         dockerfile: Dockerfile
@@ -14,7 +14,7 @@ build:
       context: packages/auth
       sync:
         manual:
-          - src: src/**/!(*.test).ts
+          - src: src/**/*.ts
             dest: .
       docker:
         dockerfile: Dockerfile
@@ -22,7 +22,7 @@ build:
       context: packages/orders
       sync:
         manual:
-          - src: src/**/!(*.test).ts
+          - src: src/**/*.ts
             dest: .
       docker:
         dockerfile: Dockerfile
@@ -30,7 +30,7 @@ build:
       context: packages/tickets
       sync:
         manual:
-          - src: src/**/!(*.test).ts
+          - src: src/**/*.ts
             dest: .
       docker:
         dockerfile: Dockerfile
