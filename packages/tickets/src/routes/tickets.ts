@@ -19,7 +19,7 @@ function createRouter(jwtService: JWTService) {
   router.post(
     "/",
     currentUserMiddleware(jwtService),
-    requireAuth(),
+    // requireAuth(),
     (req: Request, res: Response) => {
       res.status(201).json({});
     }
@@ -28,7 +28,7 @@ function createRouter(jwtService: JWTService) {
   router.put(
     "/:id",
     currentUserMiddleware(jwtService),
-    requireAuth(),
+    // requireAuth(),
     (req: Request, res: Response) => {
       res.status(200).json({});
     }

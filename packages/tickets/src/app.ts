@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import cookieSession from "cookie-session";
 import morgan from "morgan";
 import {
