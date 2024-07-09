@@ -8,6 +8,7 @@ export { PasswordService } from "./services/password";
 export { RequestValidationError } from "./errors/request-validation-errors";
 export { UnauthorizedError } from "./errors/unauthorized-error";
 export { User } from "./models/user";
+export { Ticket } from "./models/ticket";
 export { UserPayload } from "./services/jwt";
 export { validateRequestMiddleware } from "./middlewares/validate-request";
 export { currentUserMiddleware } from "./middlewares/current-user";

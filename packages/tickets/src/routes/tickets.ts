@@ -5,7 +5,6 @@ import {
   validateRequestMiddleware,
 } from "floroz-ticketing-common";
 import { body } from "express-validator";
-import crypto from "node:crypto";
 
 const router = Router();
 
@@ -29,9 +28,6 @@ router.post(
   ],
   (req: Request, res: Response) => {
     const { title, price } = req.body;
-    const id = crypto.randomUUID();
-    const createdAt = new Date().toISOString();
-    const updatedAt = new Date().toISOString();
 
     // const ticket = Ticket.create({ title, price, id, createdAt, updatedAt });
     res.status(201).json({ title, price, id, createdAt, updatedAt });
