@@ -4,6 +4,7 @@ import {
   requireAuth,
   validateRequestMiddleware,
   Ticket,
+  BadRequestError,
 } from "floroz-ticketing-common";
 import { body } from "express-validator";
 
