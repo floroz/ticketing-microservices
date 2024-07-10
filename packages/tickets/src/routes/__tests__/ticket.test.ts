@@ -54,7 +54,7 @@ it("returns 400 for POST /api/tickets - when price is smaller than 0", async () 
     .expect(400);
 });
 
-it.only("returns 201 for POST /api/tickets - creates a new ticket", async () => {
+it("returns 201 for POST /api/tickets - creates a new ticket", async () => {
   const cookie = global.__auth_signin();
   const response = await request(app)
     .post("/api/tickets")
@@ -73,14 +73,16 @@ it.only("returns 201 for POST /api/tickets - creates a new ticket", async () => 
   expect(response.body.updatedAt).toBeDefined();
 });
 
-it("returns 200 for PUT /api/tickets/:id", async () => {
+it("returns 200 for PUT /api/tickets/:id - when ticket is found", async () => {
   const cookie = global.__auth_signin();
   const response = await request(app)
     .put("/api/tickets/1")
     .set("Cookie", cookie)
     .send({
+      userId: "1234",
       title: "test",
       price: 10,
+      currency: "USD",
     })
     .expect(200);
 
@@ -91,13 +93,16 @@ it("returns 200 for PUT /api/tickets/:id", async () => {
   expect(response.body.updatedAt).toBeDefined();
 });
 
-it.skip("returns 200 for PUT /api/tickets/:id - for partial update", async () => {
+it("returns 201 for PUT /api/tickets/:id - when ticket is not found", async () => {
   const cookie = global.__auth_signin();
   const response = await request(app)
     .put("/api/tickets/1")
     .set("Cookie", cookie)
     .send({
+      userId: "1234",
       title: "test",
+      price: 10,
+      currency: "USD",
     })
     .expect(200);
 

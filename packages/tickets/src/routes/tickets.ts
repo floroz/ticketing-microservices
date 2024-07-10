@@ -66,25 +66,37 @@ router.put(
   "/:id",
   [
     requireAuth(),
-    body("title").isString().optional(),
+    body("title").not().isEmpty().isString().withMessage("Title is required"),
     body("price")
-      .optional()
       .isFloat({ gt: 0 })
       .withMessage("Price must be greater than 0"),
+    body("currency")
+      .not()
+      .isEmpty()
+      .isString()
+      .withMessage("Currency is required"),
     validateRequestMiddleware,
   ],
-  (req: Request, res: Response) => {
-    const { title, price } = req.body;
+  async (req: Request, res: Response) => {
+    const { title, price, currency } = req.body;
     const { id } = req.params;
 
-    if (!title && !price) {
-      throw new GenericError("Title or price is required", 400);
+    try {
+      const updatedTicket = await Ticket.findByIdAndUpdate(
+        id,
+        { title, price, currency },
+        { new: true, runValidators: true }
+      );
+
+      if (!updatedTicket) {
+        throw new BadRequestError("Invalid ticket id.");
+      }
+
+      res.send(updatedTicket);
+    } catch (error) {
+      console.error({ error });
+      throw new GenericError("Error in updating the ticket.", 500);
     }
-
-    const createdAt = new Date().toISOString();
-    const updatedAt = new Date().toISOString();
-
-    res.status(200).json({ title, price, id, createdAt, updatedAt });
   }
 );
 
