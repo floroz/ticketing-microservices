@@ -3,6 +3,7 @@ import {
   GenericError,
   requireAuth,
   validateRequestMiddleware,
+  Ticket,
 } from "floroz-ticketing-common";
 import { body } from "express-validator";
 
@@ -24,13 +25,40 @@ router.post(
     body("price")
       .isFloat({ gt: 0 })
       .withMessage("Price must be greater than 0"),
+    body("currency")
+      .not()
+      .isEmpty()
+      .isString()
+      .withMessage("Currency is required"),
     validateRequestMiddleware,
   ],
-  (req: Request, res: Response) => {
-    const { title, price } = req.body;
+  async (req: Request, res: Response) => {
+    const { title, price, currency } = req.body;
 
-    // const ticket = Ticket.create({ title, price, id, createdAt, updatedAt });
-    res.status(201).json({ title, price, id, createdAt, updatedAt });
+    try {
+      const ticket = await Ticket.create({
+        title,
+        price,
+        currency,
+        userId: req.currentUser?.id,
+      });
+
+      res.status(201).json({
+        userId: ticket.userId,
+        title: ticket.title,
+        price: ticket.price,
+        currency: ticket.currency,
+        id: ticket.id,
+        createdAt: ticket.createdAt,
+        updatedAt: ticket.updatedAt,
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new GenericError(error.message, 500);
+      }
+      console.error({ error });
+      throw new GenericError("Error in creating a ticket.", 500);
+    }
   }
 );
 

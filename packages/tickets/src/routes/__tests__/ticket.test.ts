@@ -54,14 +54,16 @@ it("returns 400 for POST /api/tickets - when price is smaller than 0", async () 
     .expect(400);
 });
 
-it("returns 201 for POST /api/tickets", async () => {
+it.only("returns 201 for POST /api/tickets - creates a new ticket", async () => {
   const cookie = global.__auth_signin();
   const response = await request(app)
     .post("/api/tickets")
     .set("Cookie", cookie)
     .send({
+      userId: "1234",
       title: "test",
       price: 10,
+      currency: "USD",
     })
     .expect(201);
   expect(response.body.title).toBe("test");
