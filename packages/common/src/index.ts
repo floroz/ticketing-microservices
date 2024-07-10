@@ -4,6 +4,7 @@ export { errorHandlerMiddlewere } from "./middlewares/errors";
 export { GenericError } from "./errors/generic-error";
 export { JWTService } from "./services/jwt";
 export { NotFoundError } from "./errors/not-found-error";
+export { BadRequestError } from "./errors/bad-request-error";
 export { PasswordService } from "./services/password";
 export { RequestValidationError } from "./errors/request-validation-errors";
 export { UnauthorizedError } from "./errors/unauthorized-error";
