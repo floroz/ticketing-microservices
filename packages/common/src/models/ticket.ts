@@ -45,11 +45,9 @@ const ticketSchema = new mongoose.Schema({
   },
   createdAt: {
     type: String,
-    required: true,
   },
   updatedAt: {
     type: String,
-    required: true,
   },
 });
 
