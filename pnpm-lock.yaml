@@ -227,8 +227,8 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1
       floroz-ticketing-common:
-        specifier: 1.0.23
-        version: 1.0.23(@types/node@20.11.28)
+        specifier: 1.0.24
+        version: 1.0.24(@types/node@20.11.28)
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
@@ -2710,8 +2710,8 @@ packages:
       - supports-color
     dev: false
 
-  /floroz-ticketing-common@1.0.23(@types/node@20.11.28):
-    resolution: {integrity: sha512-E0ImrB2DzZNP4qrTO5t3eg5utkfamIiknR7X6xHAfGcuBtD1K/S9LvQJpLG+2O/m+oTQAy4PYNskjOpqEwOrEQ==}
+  /floroz-ticketing-common@1.0.24(@types/node@20.11.28):
+    resolution: {integrity: sha512-TESdWlzbj2FChwck5KbzLgsiTuDm6TfNHynbaGTlAIDF12/RWTWZ8R/d1K8iUMUYRPWetEPBp79F23zmVJ35wA==}
     dependencies:
       '@types/bcrypt': 5.0.2
       '@types/cookie-session': 2.0.48
