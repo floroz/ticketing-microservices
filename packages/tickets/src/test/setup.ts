@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 let mongo: MongoMemoryServer | null = null;
 
 declare global {
-  var __auth_signin: () => string[];
+  var __get_cookie: () => string[];
 }
 
 beforeAll(async () => {
@@ -31,7 +31,7 @@ afterAll(async () => {
   await mongoose.connection.close();
 });
 
-global.__auth_signin = () => {
+global.__get_cookie = () => {
   const payload = {
     email: "test@test.com",
     id: "123123",

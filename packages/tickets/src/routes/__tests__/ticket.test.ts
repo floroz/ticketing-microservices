@@ -3,33 +3,46 @@ import { app } from "../../app";
 import { it, expect } from "vitest";
 import mongoose from "mongoose";
 
-// it("returns 200 for GET /api/tickets", async () => {
-//   const cookie = global.__auth_signin();
+it("returns 200 for GET /api/tickets", async () => {
+  const ticket1 = {
+    title: "new-ticket-1",
+    price: 12,
+    currency: "USD",
+    userId: "12345",
+  };
 
-//   const ticket = {
-//     title: "new-ticket",
-//     price: 12,
-//     currency: "USD",
-//     userId: "12345",
-//   };
+  const ticket2 = {
+    title: "new-ticket-2",
+    price: 12,
+    currency: "USD",
+    userId: "12345",
+  };
 
-//   const postResponse = await request(app)
-//     .post("/api/tickets")
-//     .set("Cookie", cookie)
-//     .send(ticket)
-//     .expect(201);
+  // create 2 tickets
+  await request(app)
+    .post("/api/tickets")
+    .set("Cookie", global.__get_cookie())
+    .send(ticket1)
+    .expect(201);
+  await request(app)
+    .post("/api/tickets")
+    .set("Cookie", global.__get_cookie())
+    .send(ticket2)
+    .expect(201);
 
-//   const response = await request(app)
-//     .get("/api/tickets")
-//     .set("Cookie", cookie)
-//     .expect(200);
+  const response = await request(app).get("/api/tickets").expect(200);
 
-//   expect(response.body.title).toBe(ticket.title);
-// });
+  expect(response.body.tickets[0].title).toBe(ticket1.title);
+  expect(response.body.tickets[1].title).toBe(ticket2.title);
+});
+
+it("returns 200 and an empty collection for GET /api/tickets - when empty", async () => {
+  const res = await request(app).get("/api/tickets").expect(200);
+
+  expect(res.body.tickets).toEqual([]);
+});
 
 it("returns 200 for GET /api/tickets/:id", async () => {
-  const cookie = global.__auth_signin();
-
   const ticket = {
     title: "new-ticket",
     price: 12,
@@ -39,20 +52,25 @@ it("returns 200 for GET /api/tickets/:id", async () => {
 
   const postResponse = await request(app)
     .post("/api/tickets")
-    .set("Cookie", cookie)
+    .set("Cookie", global.__get_cookie())
     .send(ticket)
     .expect(201);
 
   const response = await request(app)
     .get("/api/tickets/" + postResponse.body.id)
-    .set("Cookie", cookie)
+    .set("Cookie", global.__get_cookie())
     .expect(200);
 
   expect(response.body.title).toBe(ticket.title);
 });
 
 it("returns 404 for GET /api/tickets/:id - when ticket is not found", async () => {
-  await request(app).get("/api/tickets/1").expect(404);
+  const id = new mongoose.Types.ObjectId().toHexString();
+
+  await request(app)
+    .get("/api/tickets/" + id)
+    .set("Cookie", global.__get_cookie())
+    .expect(404);
 });
 
 it("returns 401 for POST /api/tickets - when unauthorized", async () => {
@@ -60,14 +78,16 @@ it("returns 401 for POST /api/tickets - when unauthorized", async () => {
 });
 
 it("returns 401 for PUT /api/tickets/:id - when unauthorized", async () => {
-  await request(app).put("/api/tickets/1").expect(401);
+  const id = new mongoose.Types.ObjectId().toHexString();
+  await request(app)
+    .put("/api/tickets/" + id)
+    .expect(401);
 });
 
 it("returns 400 for POST /api/tickets - when title is required", async () => {
-  const cookie = global.__auth_signin();
   await request(app)
     .post("/api/tickets")
-    .set("Cookie", cookie)
+    .set("Cookie", global.__get_cookie())
     .send({
       price: 10,
     })
@@ -75,10 +95,9 @@ it("returns 400 for POST /api/tickets - when title is required", async () => {
 });
 
 it("returns 400 for POST /api/tickets - when price is required", async () => {
-  const cookie = global.__auth_signin();
   await request(app)
     .post("/api/tickets")
-    .set("Cookie", cookie)
+    .set("Cookie", global.__get_cookie())
     .send({
       title: "test",
     })
@@ -86,10 +105,9 @@ it("returns 400 for POST /api/tickets - when price is required", async () => {
 });
 
 it("returns 400 for POST /api/tickets - when price is smaller than 0", async () => {
-  const cookie = global.__auth_signin();
   await request(app)
     .post("/api/tickets")
-    .set("Cookie", cookie)
+    .set("Cookie", global.__get_cookie())
     .send({
       title: "test",
       price: -10,
@@ -98,10 +116,9 @@ it("returns 400 for POST /api/tickets - when price is smaller than 0", async () 
 });
 
 it("returns 201 for POST /api/tickets - creates a new ticket", async () => {
-  const cookie = global.__auth_signin();
   const response = await request(app)
     .post("/api/tickets")
-    .set("Cookie", cookie)
+    .set("Cookie", global.__get_cookie())
     .send({
       userId: "1234",
       title: "test",
@@ -117,11 +134,10 @@ it("returns 201 for POST /api/tickets - creates a new ticket", async () => {
 });
 
 it("returns 200 for PUT /api/tickets/:id - when ticket is found", async () => {
-  const cookie = global.__auth_signin();
   // create  ticket to update
   const res = await request(app)
     .post("/api/tickets")
-    .set("Cookie", cookie)
+    .set("Cookie", global.__get_cookie())
     .send({
       userId: "1234",
       title: "test",
@@ -131,7 +147,7 @@ it("returns 200 for PUT /api/tickets/:id - when ticket is found", async () => {
     .expect(201);
   const response = await request(app)
     .put("/api/tickets/" + res.body.id)
-    .set("Cookie", cookie)
+    .set("Cookie", global.__get_cookie())
     .send({
       userId: "1234",
       title: "test",
@@ -148,11 +164,10 @@ it("returns 200 for PUT /api/tickets/:id - when ticket is found", async () => {
 });
 
 it("returns 404 for PUT /api/tickets/:id - when ticket is not found", async () => {
-  const cookie = global.__auth_signin();
-  const fakeId = new mongoose.Types.ObjectId().toHexString();
+  const ticketId = new mongoose.Types.ObjectId().toHexString();
   const response = await request(app)
-    .put(`/api/tickets/${fakeId}`)
-    .set("Cookie", cookie)
+    .put(`/api/tickets/${ticketId}`)
+    .set("Cookie", global.__get_cookie())
     .send({
       userId: "1234",
       title: "test",

@@ -20,8 +20,18 @@ const validationMiddleware = [
 ];
 const router = Router();
 
-router.get("/", (req: Request, res: Response) => {
-  res.status(200).send({ message: "Hello, ticket!" });
+router.get("/", async (req: Request, res: Response) => {
+  try {
+    const { offset = 0, limit = 100 } = req.query;
+
+    const tickets = await Ticket.find({})
+      .skip(Number(offset))
+      .limit(Number(limit));
+
+    return res.status(200).send({ tickets, offset, limit });
+  } catch (error) {
+    throw new GenericError("Error in fetching the tickets.", 500);
+  }
 });
 
 router.get("/:id", async (req: Request, res: Response) => {
@@ -64,8 +74,6 @@ router.post(
         price: ticket.price,
         currency: ticket.currency,
         id: ticket.id,
-        createdAt: ticket.createdAt,
-        updatedAt: ticket.updatedAt,
       });
     } catch (error) {
       console.error({ error });
