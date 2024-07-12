@@ -16,40 +16,31 @@ export interface TicketDoc extends mongoose.Document {
   price: number;
   currency: string;
   userId: string;
-  /**
-   * ISO Timestamp
-   */
-  createdAt: string;
-  /**
-   * ISO Timestamp
-   */
-  updatedAt: string;
 }
 
-const ticketSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
+const ticketSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+    currency: {
+      type: String,
+      required: true,
+    },
+    userId: {
+      type: String,
+      required: true,
+    },
   },
-  price: {
-    type: Number,
-    required: true,
-  },
-  currency: {
-    type: String,
-    required: true,
-  },
-  userId: {
-    type: String,
-    required: true,
-  },
-  createdAt: {
-    type: String,
-  },
-  updatedAt: {
-    type: String,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 ticketSchema.set("toJSON", {
   transform: (doc: any, ret: any) => {
@@ -61,12 +52,6 @@ ticketSchema.set("toJSON", {
 ticketSchema.statics.build = (payload: TicketCreationPayload) => {
   return new Ticket(payload);
 };
-
-ticketSchema.pre("save", async function (done) {
-  this.createdAt = new Date().toISOString();
-  this.updatedAt = new Date().toISOString();
-  done();
-});
 
 const Ticket = mongoose.model<TicketDoc, TicketModel>("Ticket", ticketSchema);
 
