@@ -30,8 +30,10 @@ it("returns 200 for GET /api/tickets", async () => {
     .send(ticket2)
     .expect(201);
 
+  // get all tickets
   const response = await request(app).get("/api/tickets").expect(200);
 
+  expect(response.body.tickets).toHaveLength(2);
   expect(response.body.tickets[0].title).toBe(ticket1.title);
   expect(response.body.tickets[1].title).toBe(ticket2.title);
 });
@@ -75,13 +77,6 @@ it("returns 404 for GET /api/tickets/:id - when ticket is not found", async () =
 
 it("returns 401 for POST /api/tickets - when unauthorized", async () => {
   await request(app).post("/api/tickets").expect(401);
-});
-
-it("returns 401 for PUT /api/tickets/:id - when unauthorized", async () => {
-  const id = new mongoose.Types.ObjectId().toHexString();
-  await request(app)
-    .put("/api/tickets/" + id)
-    .expect(401);
 });
 
 it("returns 400 for POST /api/tickets - when title is required", async () => {
@@ -161,6 +156,24 @@ it("returns 200 for PUT /api/tickets/:id - when ticket is found", async () => {
   expect(response.body.id).toBe(res.body.id);
   expect(response.body.createdAt).toBeDefined();
   expect(response.body.updatedAt).toBeDefined();
+});
+
+it("returns 400 for PUT /api/tickets/:id - when title is required", async () => {
+  const id = new mongoose.Types.ObjectId().toHexString();
+  await request(app)
+    .put("/api/tickets/" + id)
+    .set("Cookie", global.__get_cookie())
+    .send({
+      price: 10,
+    })
+    .expect(400);
+});
+
+it("returns 401 for PUT /api/tickets/:id - when unauthorized", async () => {
+  const id = new mongoose.Types.ObjectId().toHexString();
+  await request(app)
+    .put("/api/tickets/" + id)
+    .expect(401);
 });
 
 it("returns 404 for PUT /api/tickets/:id - when ticket is not found", async () => {

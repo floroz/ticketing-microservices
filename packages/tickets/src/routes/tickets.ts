@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import {
   GenericError,
   requireAuth,
@@ -20,7 +20,7 @@ const validationMiddleware = [
 ];
 const router = Router();
 
-router.get("/", async (req: Request, res: Response) => {
+router.get("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { offset = 0, limit = 100 } = req.query;
 
@@ -30,34 +30,33 @@ router.get("/", async (req: Request, res: Response) => {
 
     return res.status(200).send({ tickets, offset, limit });
   } catch (error) {
-    throw new GenericError("Error in fetching the tickets.", 500);
+    next(new GenericError("Error in fetching the tickets.", 500));
   }
 });
 
-router.get("/:id", async (req: Request, res: Response) => {
+router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
 
   try {
     const ticket = await Ticket.findById(id);
 
     if (!ticket) {
-      throw new NotFoundError();
+      return next(new NotFoundError());
     }
 
     res.status(200).send(ticket);
   } catch (error) {
-    console.error({ error });
     if (error instanceof NotFoundError) {
-      throw error;
+      return next(error);
     }
-    throw new GenericError("Error in fetching the ticket.", 500);
+    return next(new GenericError("Error in fetching the ticket.", 500));
   }
 });
 
 router.post(
   "/",
   [requireAuth(), ...validationMiddleware],
-  async (req: Request, res: Response) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     const { title, price, currency } = req.body;
 
     try {
@@ -74,13 +73,14 @@ router.post(
         price: ticket.price,
         currency: ticket.currency,
         id: ticket.id,
+        createdAt: ticket.createdAt,
+        updatedAt: ticket.updatedAt,
       });
     } catch (error) {
-      console.error({ error });
       if (error instanceof Error) {
-        throw new GenericError(error.message, 500);
+        return next(new GenericError(error.message, 500));
       }
-      throw new GenericError("Error in creating a ticket.", 500);
+      return next(new GenericError("Error in creating a ticket.", 500));
     }
   }
 );
@@ -88,7 +88,7 @@ router.post(
 router.put(
   "/:id",
   [requireAuth(), ...validationMiddleware],
-  async (req: Request, res: Response) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     const { title, price, currency } = req.body;
     const { id } = req.params;
 
@@ -100,16 +100,15 @@ router.put(
       );
 
       if (!updatedTicket) {
-        throw new NotFoundError();
+        return next(new NotFoundError());
       }
 
       res.send(updatedTicket);
     } catch (error) {
-      console.error({ error });
       if (error instanceof NotFoundError) {
-        throw error;
+        return next(error);
       }
-      throw new GenericError("Error in updating the ticket.", 500);
+      return next(new GenericError("Error in updating the ticket.", 500));
     }
   }
 );
