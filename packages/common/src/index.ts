@@ -8,6 +8,7 @@ export { BadRequestError } from "./errors/bad-request-error";
 export { PasswordService } from "./services/password";
 export { RequestValidationError } from "./errors/request-validation-errors";
 export { UnauthorizedError } from "./errors/unauthorized-error";
+export { ForbiddenError } from "./errors/forbidden-error";
 export { User } from "./models/user";
 export { Ticket } from "./models/ticket";
 export { UserPayload } from "./services/jwt";

@@ -5,6 +5,7 @@ import {
   validateRequestMiddleware,
   Ticket,
   NotFoundError,
+  ForbiddenError,
 } from "floroz-ticketing-common";
 import { body } from "express-validator";
 
@@ -103,7 +104,7 @@ router.put(
 
       // prevent updating if the user is not the owner of the ticket
       if (userId !== ticket?.userId) {
-        return next(new GenericError("Forbidden operation.", 403));
+        return next(new ForbiddenError());
       }
 
       const updated = await ticket.set({ title, price, currency }).save();
