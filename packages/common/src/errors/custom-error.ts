@@ -1,10 +1,12 @@
+import { NormalizedErrorResponse } from "../types/errors";
+
 export abstract class CustomError extends Error {
-    constructor(message: string) {
+  constructor(message: string) {
     super(message);
 
     Object.setPrototypeOf(this, new.target.prototype);
-    }
-  
-  abstract get normalizedResponse(): { errors: { message: string }[] };
+  }
+
+  abstract get normalizedResponse(): NormalizedErrorResponse;
   abstract statusCode: number;
 }
