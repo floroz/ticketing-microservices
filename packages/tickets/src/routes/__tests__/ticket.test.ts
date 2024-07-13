@@ -176,6 +176,32 @@ it("returns 401 for PUT /api/tickets/:id - when unauthorized", async () => {
     .expect(401);
 });
 
+it("returns 403 for PUT /api/tickets/:id - when user is not allowed to update", async () => {
+  const ticket = {
+    userId: "1234",
+    title: "test",
+    price: 15,
+    currency: "USD",
+  };
+
+  const res = await request(app)
+    .post("/api/tickets")
+    .set("Cookie", global.__get_cookie({ randomize: true }))
+    .send(ticket)
+    .expect(201);
+
+  await request(app)
+    .put("/api/tickets/" + res.body.id)
+    .set("Cookie", global.__get_cookie({ randomize: true }))
+    .send({
+      userId: "1234",
+      title: "test",
+      price: 15,
+      currency: "USD",
+    })
+    .expect(403);
+});
+
 it("returns 404 for PUT /api/tickets/:id - when ticket is not found", async () => {
   const ticketId = new mongoose.Types.ObjectId().toHexString();
   const response = await request(app)

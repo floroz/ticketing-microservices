@@ -30,7 +30,7 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 
     return res.status(200).send({ tickets, offset, limit });
   } catch (error) {
-    next(new GenericError("Error in fetching the tickets.", 500));
+    return next(new GenericError("Error in fetching the tickets.", 500));
   }
 });
 
@@ -92,20 +92,25 @@ router.put(
     const { title, price, currency } = req.body;
     const { id } = req.params;
 
-    try {
-      const updatedTicket = await Ticket.findByIdAndUpdate(
-        id,
-        { title, price, currency },
-        { new: true }
-      );
+    const userId = req.currentUser!.id;
 
-      if (!updatedTicket) {
+    try {
+      const ticket = await Ticket.findById(id);
+
+      if (!ticket) {
         return next(new NotFoundError());
       }
 
-      res.send(updatedTicket);
+      // prevent updating if the user is not the owner of the ticket
+      if (userId !== ticket?.userId) {
+        return next(new GenericError("Forbidden operation.", 403));
+      }
+
+      const updated = await ticket.set({ title, price, currency }).save();
+
+      res.send(updated);
     } catch (error) {
-      if (error instanceof NotFoundError) {
+      if (error instanceof NotFoundError || error instanceof GenericError) {
         return next(error);
       }
       return next(new GenericError("Error in updating the ticket.", 500));
