@@ -16,6 +16,8 @@ export interface TicketDoc extends mongoose.Document {
   price: number;
   currency: string;
   userId: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const ticketSchema = new mongoose.Schema(
