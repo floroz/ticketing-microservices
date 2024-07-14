@@ -10,10 +10,10 @@ interface UserModel extends mongoose.Model<UserDoc> {
   build(payload: UserCreationPayload): UserDoc;
 }
 
-export interface UserDoc extends mongoose.Document {
+interface UserDoc extends mongoose.Document {
   email: string;
   password: string;
-  role: 'admin' | 'user';
+  role: "admin" | "user";
 }
 
 const userSchema = new mongoose.Schema({

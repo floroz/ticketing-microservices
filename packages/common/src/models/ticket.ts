@@ -11,7 +11,7 @@ interface TicketModel extends mongoose.Model<TicketDoc> {
   build(payload: TicketCreationPayload): TicketDoc;
 }
 
-export interface TicketDoc extends mongoose.Document {
+interface TicketDoc extends mongoose.Document {
   title: string;
   price: number;
   currency: string;
