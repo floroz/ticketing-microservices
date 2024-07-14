@@ -10,7 +10,6 @@ export abstract class Consumer<T extends BaseCustomEvent> {
   abstract readonly topic: T["topic"];
   abstract readonly queueGroup: string;
   abstract onMessage(event: T, message: Message): void;
-  abstract logMessage(event: T, message: Message): void;
 
   protected ackWait: number = 5 * 1000;
 
@@ -24,15 +23,15 @@ export abstract class Consumer<T extends BaseCustomEvent> {
       .setDurableName(this.queueGroup);
   }
 
-  onConnect(cb: () => void): void {
+  onConnect(cb?: () => void): void {
     this.client.on("connect", () => {
-      cb();
+      cb?.();
     });
   }
 
-  onClose(cb: () => void): void {
+  onClose(cb?: () => void): void {
     this.client.on("close", () => {
-      cb();
+      cb?.();
     });
   }
 
@@ -45,7 +44,6 @@ export abstract class Consumer<T extends BaseCustomEvent> {
 
     sub.on("message", (msg: Message) => {
       const parsedData = this.parseMessage(msg);
-      this.logMessage(parsedData, msg);
       this.onMessage(parsedData, msg);
     });
 

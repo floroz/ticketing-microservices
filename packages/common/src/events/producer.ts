@@ -3,28 +3,30 @@ import { BaseCustomEvent } from "./types";
 
 export abstract class Producer<T extends BaseCustomEvent> {
   abstract readonly topic: T["topic"];
-  abstract logMessage(event: T): void;
 
   constructor(protected readonly client: Stan) {}
 
-  onConnect(cb: () => void): void {
+  onConnect(cb?: () => void): void {
     this.client.on("connect", () => {
-      console.log(`Connected to topic: ${this.topic}`);
-      cb();
+      cb?.();
     });
   }
 
-  onClose(cb: () => void): void {
+  onClose(cb?: () => void): void {
     this.client.on("close", () => {
-      console.log(`Closed connection to topic: ${this.topic}`);
-      cb();
+      cb?.();
     });
   }
 
-  publish(event: T) {
-    const data = JSON.stringify(event);
-    this.client.publish(this.topic, data);
-    this.logMessage(event);
+  publish(event: T): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.client.publish(this.topic, JSON.stringify(event), (err) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(undefined);
+      });
+    });
   }
 
   close(): void {
