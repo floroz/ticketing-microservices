@@ -247,6 +247,9 @@ importers:
       morgan:
         specifier: ^1.10.0
         version: 1.10.0
+      node-nats-streaming:
+        specifier: ^0.3.2
+        version: 0.3.2
       pino:
         specifier: ^9.2.0
         version: 9.2.0
