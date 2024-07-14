@@ -8,6 +8,10 @@ import {
   ForbiddenError,
 } from "floroz-ticketing-common";
 import { body } from "express-validator";
+import { TicketCreatedProducer } from "../producers/ticket-created-producer";
+import { stanClient } from "../nats/client";
+
+const ticketCreatedProducer = new TicketCreatedProducer(stanClient);
 
 const validationMiddleware = [
   body("title").not().isEmpty().isString().withMessage("Title is required"),
@@ -67,6 +71,21 @@ router.post(
         currency,
         userId: req.currentUser?.id,
       }).save();
+
+      try {
+        await ticketCreatedProducer.publish({
+          id: ticket.id,
+          userId: ticket.userId,
+          title: ticket.title,
+          price: ticket.price,
+          currency: ticket.currency,
+        });
+      } catch (error) {
+        // TODO: retry strategy
+        return next(
+          new GenericError("Error in publishing the ticket created event.", 500)
+        );
+      }
 
       res.status(201).send({
         userId: ticket.userId,
