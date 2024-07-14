@@ -18,7 +18,11 @@ export abstract class Producer<T extends BaseCustomEvent> {
     });
   }
 
-  publish(event: T): Promise<void> {
+  publish(data: T["data"]): Promise<void> {
+    const event = {
+      topic: this.topic,
+      data,
+    };
     return new Promise((resolve, reject) => {
       this.client.publish(this.topic, JSON.stringify(event), (err) => {
         if (err) {

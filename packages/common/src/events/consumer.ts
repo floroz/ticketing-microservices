@@ -9,7 +9,7 @@ import { BaseCustomEvent } from "./types";
 export abstract class Consumer<T extends BaseCustomEvent> {
   abstract readonly topic: T["topic"];
   abstract readonly queueGroup: string;
-  abstract onMessage(event: T, message: Message): void;
+  abstract onMessage(data: T["data"], message: Message): void;
 
   protected ackWait: number = 5 * 1000;
 
@@ -43,8 +43,8 @@ export abstract class Consumer<T extends BaseCustomEvent> {
     );
 
     sub.on("message", (msg: Message) => {
-      const parsedData = this.parseMessage(msg);
-      this.onMessage(parsedData, msg);
+      const { data } = this.parseMessage(msg);
+      this.onMessage(data, msg);
     });
 
     return sub;

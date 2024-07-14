@@ -35,5 +35,6 @@ export type TicketDeletedEvent = {
   topic: Topics.TicketDeleted;
   data: {
     id: string;
+    userId: string;
   };
 };

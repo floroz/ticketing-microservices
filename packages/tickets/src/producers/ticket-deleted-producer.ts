@@ -7,8 +7,4 @@ export class TicketDeletedProducer extends Producer<TicketDeletedEvent> {
   constructor(client: Stan) {
     super(client);
   }
-
-  logMessage(event: TicketDeletedEvent) {
-    console.log(`Ticket deleted event: ${JSON.stringify(event)}`);
-  }
 }
