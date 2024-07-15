@@ -4,10 +4,13 @@ async function withRetry<T>(
   baseDelay: number = 1000
 ): Promise<T> {
   for (let attempt = 0; attempt < maxRetries; attempt++) {
+    console.log("Attempt: ", attempt);
     try {
       return await operation();
     } catch (error) {
+      console.error("Error: ", error);
       if (attempt === maxRetries - 1) {
+        console.log("Throwing error - max attempt reached");
         throw error;
       }
       const delay = baseDelay * Math.pow(2, attempt);

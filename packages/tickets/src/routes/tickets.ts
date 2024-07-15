@@ -84,10 +84,7 @@ router.post(
           updatedAt: ticket.updatedAt,
           createdAt: ticket.createdAt,
         };
-        await ticketCreatedProducer.publish(eventData, {
-          maxRetries: 2,
-          delay: 1000,
-        });
+        await ticketCreatedProducer.publish(eventData);
         logger.info(
           "Ticket created event published",
           JSON.stringify(eventData)
