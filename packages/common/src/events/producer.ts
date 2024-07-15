@@ -1,5 +1,6 @@
 import type { Stan } from "node-nats-streaming";
 import { BaseCustomEvent } from "./types";
+import { withRetry } from "../utils";
 
 export abstract class Producer<T extends BaseCustomEvent> {
   abstract readonly topic: T["topic"];
@@ -18,19 +19,33 @@ export abstract class Producer<T extends BaseCustomEvent> {
     });
   }
 
-  publish(data: T["data"]): Promise<void> {
+  async publish(
+    data: T["data"],
+    opts?: { maxRetries?: number; delay?: number }
+  ): Promise<void> {
     const event = {
       topic: this.topic,
       data,
     };
-    return new Promise((resolve, reject) => {
-      this.client.publish(this.topic, JSON.stringify(event), (err) => {
-        if (err) {
-          reject(err);
-        }
-        resolve(undefined);
-      });
-    });
+
+    await withRetry(
+      () =>
+        new Promise<void>((resolve, reject) => {
+          this.client.publish(this.topic, JSON.stringify(event), (err) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve();
+            }
+          });
+        }),
+      /**
+       * We want to always ensure that the event is published to the topic.
+       * We can set the maxRetries to Infinity to ensure that the event is published to the topic.
+       */
+      opts?.maxRetries ?? Infinity,
+      opts?.delay || 1000
+    );
   }
 
   close(): void {

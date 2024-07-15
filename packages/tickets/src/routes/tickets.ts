@@ -79,6 +79,8 @@ router.post(
           title: ticket.title,
           price: ticket.price,
           currency: ticket.currency,
+          updatedAt: ticket.updatedAt,
+          createdAt: ticket.createdAt,
         });
       } catch (error) {
         // TODO: retry strategy
