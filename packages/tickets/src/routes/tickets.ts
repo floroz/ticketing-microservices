@@ -6,10 +6,12 @@ import {
   Ticket,
   NotFoundError,
   ForbiddenError,
+  TicketCreatedEvent,
 } from "floroz-ticketing-common";
 import { body } from "express-validator";
 import { TicketCreatedProducer } from "../producers/ticket-created-producer";
 import { stanClient } from "../nats/client";
+import { logger } from "../logger";
 
 const ticketCreatedProducer = new TicketCreatedProducer(stanClient);
 
@@ -73,7 +75,7 @@ router.post(
       }).save();
 
       try {
-        await ticketCreatedProducer.publish({
+        const eventData: TicketCreatedEvent["data"] = {
           id: ticket.id,
           userId: ticket.userId,
           title: ticket.title,
@@ -81,7 +83,15 @@ router.post(
           currency: ticket.currency,
           updatedAt: ticket.updatedAt,
           createdAt: ticket.createdAt,
+        };
+        await ticketCreatedProducer.publish(eventData, {
+          maxRetries: 2,
+          delay: 1000,
         });
+        logger.info(
+          "Ticket created event published",
+          JSON.stringify(eventData)
+        );
       } catch (error) {
         // TODO: retry strategy
         return next(

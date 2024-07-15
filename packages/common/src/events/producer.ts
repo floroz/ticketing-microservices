@@ -1,6 +1,7 @@
 import type { Stan } from "node-nats-streaming";
 import { BaseCustomEvent } from "./types";
 import { withRetry } from "../utils";
+import { logger } from "../logger";
 
 export abstract class Producer<T extends BaseCustomEvent> {
   abstract readonly topic: T["topic"];
@@ -27,14 +28,16 @@ export abstract class Producer<T extends BaseCustomEvent> {
       topic: this.topic,
       data,
     };
-
     await withRetry(
       () =>
         new Promise<void>((resolve, reject) => {
+          logger.debug("Publishing event...", event);
           this.client.publish(this.topic, JSON.stringify(event), (err) => {
             if (err) {
+              logger.error("Error publishing event", err);
               reject(err);
             } else {
+              logger.info("Event published", event);
               resolve();
             }
           });
