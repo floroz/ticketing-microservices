@@ -10,7 +10,7 @@ import {
 } from "floroz-ticketing-common";
 import { body } from "express-validator";
 import { TicketCreatedProducer } from "../events/producers/ticket-created-producer";
-import { getStanClient } from "../events/nats/client";
+import { NATS } from "floroz-ticketing-common";
 import { logger } from "../logger";
 
 const validationMiddleware = [
@@ -62,7 +62,7 @@ router.post(
   "/",
   [requireAuth(), ...validationMiddleware],
   async (req: Request, res: Response, next: NextFunction) => {
-    const ticketCreatedProducer = new TicketCreatedProducer(getStanClient());
+    const ticketCreatedProducer = new TicketCreatedProducer(NATS.client);
 
     const { title, price, currency } = req.body;
 
