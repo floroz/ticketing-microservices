@@ -9,11 +9,9 @@ import {
   TicketCreatedEvent,
 } from "floroz-ticketing-common";
 import { body } from "express-validator";
-import { TicketCreatedProducer } from "../producers/ticket-created-producer";
-import { stanClient } from "../nats/client";
+import { TicketCreatedProducer } from "../events/producers/ticket-created-producer";
+import { getStanClient } from "../events/nats/client";
 import { logger } from "../logger";
-
-const ticketCreatedProducer = new TicketCreatedProducer(stanClient);
 
 const validationMiddleware = [
   body("title").not().isEmpty().isString().withMessage("Title is required"),
@@ -64,6 +62,8 @@ router.post(
   "/",
   [requireAuth(), ...validationMiddleware],
   async (req: Request, res: Response, next: NextFunction) => {
+    const ticketCreatedProducer = new TicketCreatedProducer(getStanClient());
+
     const { title, price, currency } = req.body;
 
     try {
@@ -90,7 +90,7 @@ router.post(
           JSON.stringify(eventData)
         );
       } catch (error) {
-        // TODO: retry strategy
+        logger.error("Error in publishing the ticket created event.", error);
         return next(
           new GenericError("Error in publishing the ticket created event.", 500)
         );
@@ -106,6 +106,7 @@ router.post(
         updatedAt: ticket.updatedAt,
       });
     } catch (error) {
+      logger.error("Error in creating a ticket.", error);
       if (error instanceof Error) {
         return next(new GenericError(error.message, 500));
       }

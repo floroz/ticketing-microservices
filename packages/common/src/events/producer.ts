@@ -6,7 +6,7 @@ import { logger } from "../logger";
 export abstract class Producer<T extends BaseCustomEvent> {
   abstract readonly topic: T["topic"];
 
-  constructor(protected readonly client: Stan) {}
+  constructor(private readonly client: Stan) {}
 
   onConnect(cb?: () => void): void {
     this.client.on("connect", () => {
@@ -26,7 +26,6 @@ export abstract class Producer<T extends BaseCustomEvent> {
       data,
     };
     return new Promise<void>((resolve, reject) => {
-      logger.info("Start publishing...", event);
       this.client.publish(this.topic, JSON.stringify(event), (err) => {
         if (err) {
           logger.error("Error publishing event", err);
