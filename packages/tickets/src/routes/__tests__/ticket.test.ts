@@ -1,6 +1,6 @@
 import request from "supertest";
 import { app } from "../../app";
-import { it, expect, vi } from "vitest";
+import { it, expect, vi, beforeEach, afterAll } from "vitest";
 import mongoose from "mongoose";
 
 vi.mock("floroz-ticketing-common", async () => ({
@@ -21,6 +21,30 @@ vi.mock("../../events/producers", () => ({
     publish: vi.fn(),
   })),
 }));
+
+const ticketCreatePublish = vi.fn();
+const ticketUpdatePublish = vi.fn();
+const ticketDeletePublish = vi.fn();
+
+vi.mock("../../events/producers", () => ({
+  TicketCreatedProducer: vi.fn().mockImplementation(() => ({
+    publish: ticketCreatePublish,
+  })),
+  TicketUpdatedProducer: vi.fn().mockImplementation(() => ({
+    publish: ticketUpdatePublish,
+  })),
+  TicketDeletedProducer: vi.fn().mockImplementation(() => ({
+    publish: ticketDeletePublish,
+  })),
+}));
+
+beforeEach(() => {
+  vi.clearAllMocks();
+});
+
+afterAll(() => {
+  vi.resetAllMocks();
+});
 
 it("returns 200 for GET /api/tickets", async () => {
   const ticket1 = {
@@ -51,6 +75,8 @@ it("returns 200 for GET /api/tickets", async () => {
 
   // get all tickets
   const response = await request(app).get("/api/tickets").expect(200);
+
+  expect(ticketCreatePublish).toHaveBeenCalledTimes(2);
 
   expect(response.body.tickets).toHaveLength(2);
   expect(response.body.tickets[0].title).toBe(ticket1.title);
@@ -145,6 +171,8 @@ it("returns 201 for POST /api/tickets - creates a new ticket", async () => {
   expect(response.body.id).toBeDefined();
   expect(response.body.createdAt).toBeDefined();
   expect(response.body.updatedAt).toBeDefined();
+
+  expect(ticketCreatePublish).toHaveBeenCalledTimes(1);
 });
 
 it("returns 200 for PUT /api/tickets/:id - when ticket is found", async () => {
@@ -175,6 +203,8 @@ it("returns 200 for PUT /api/tickets/:id - when ticket is found", async () => {
   expect(response.body.id).toBe(res.body.id);
   expect(response.body.createdAt).toBeDefined();
   expect(response.body.updatedAt).toBeDefined();
+
+  expect(ticketUpdatePublish).toHaveBeenCalledTimes(1);
 });
 
 it("returns 400 for PUT /api/tickets/:id - when title is required", async () => {
@@ -253,6 +283,8 @@ it("returns 204 for DELETE /api/tickets/:id - when ticket is found", async () =>
     .delete("/api/tickets/" + res.body.id)
     .set("Cookie", global.__get_cookie())
     .expect(204);
+
+  expect(ticketDeletePublish).toHaveBeenCalledTimes(1);
 });
 
 it("returns 404 for DELETE /api/tickets/:id - when ticket is not found", async () => {
