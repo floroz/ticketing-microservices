@@ -1,7 +1,26 @@
 import request from "supertest";
 import { app } from "../../app";
-import { it, expect } from "vitest";
+import { it, expect, vi } from "vitest";
 import mongoose from "mongoose";
+
+vi.mock("floroz-ticketing-common", async () => ({
+  ...(await vi.importActual("floroz-ticketing-common")),
+  NATS: {
+    connect: vi.fn(),
+  },
+}));
+
+vi.mock("../../events/producers", () => ({
+  TicketCreatedProducer: vi.fn().mockImplementation(() => ({
+    publish: vi.fn(),
+  })),
+  TicketUpdatedProducer: vi.fn().mockImplementation(() => ({
+    publish: vi.fn(),
+  })),
+  TicketDeletedProducer: vi.fn().mockImplementation(() => ({
+    publish: vi.fn(),
+  })),
+}));
 
 it("returns 200 for GET /api/tickets", async () => {
   const ticket1 = {
@@ -214,4 +233,32 @@ it("returns 404 for PUT /api/tickets/:id - when ticket is not found", async () =
       currency: "USD",
     });
   expect(response.status).toBe(404);
+});
+
+it("returns 204 for DELETE /api/tickets/:id - when ticket is found", async () => {
+  const ticket = {
+    userId: "1234",
+    title: "test",
+    price: 10,
+    currency: "USD",
+  };
+
+  const res = await request(app)
+    .post("/api/tickets")
+    .set("Cookie", global.__get_cookie())
+    .send(ticket)
+    .expect(201);
+
+  const response = await request(app)
+    .delete("/api/tickets/" + res.body.id)
+    .set("Cookie", global.__get_cookie())
+    .expect(204);
+});
+
+it("returns 404 for DELETE /api/tickets/:id - when ticket is not found", async () => {
+  const id = new mongoose.Types.ObjectId().toHexString();
+  await request(app)
+    .delete("/api/tickets/" + id)
+    .set("Cookie", global.__get_cookie())
+    .expect(404);
 });

@@ -7,9 +7,15 @@ import {
   NotFoundError,
   ForbiddenError,
   TicketCreatedEvent,
+  TicketUpdatedEvent,
+  TicketDeletedEvent,
 } from "floroz-ticketing-common";
 import { body } from "express-validator";
-import { TicketCreatedProducer } from "../events/producers/ticket-created-producer";
+import {
+  TicketCreatedProducer,
+  TicketUpdatedProducer,
+  TicketDeletedProducer,
+} from "../events/producers";
 import { NATS } from "floroz-ticketing-common";
 import { logger } from "../logger";
 
@@ -119,6 +125,7 @@ router.put(
   "/:id",
   [requireAuth(), ...validationMiddleware],
   async (req: Request, res: Response, next: NextFunction) => {
+    const ticketUpdatedProducer = new TicketUpdatedProducer(NATS.client);
     const { title, price, currency } = req.body;
     const { id } = req.params;
 
@@ -138,12 +145,70 @@ router.put(
 
       const updated = await ticket.set({ title, price, currency }).save();
 
+      const eventData: TicketUpdatedEvent["data"] = {
+        id: updated.id,
+        title: updated.title,
+        price: updated.price,
+        currency: updated.currency,
+        userId: updated.userId,
+        createdAt: updated.createdAt,
+        updatedAt: updated.updatedAt,
+      };
+      try {
+        await ticketUpdatedProducer.publish(eventData);
+        logger.info(
+          "Ticket updated event published",
+          JSON.stringify(eventData)
+        );
+      } catch (error) {
+        logger.error("Error in publishing the ticket updated event.", error);
+      }
       res.send(updated);
     } catch (error) {
       if (error instanceof NotFoundError || error instanceof GenericError) {
         return next(error);
       }
       return next(new GenericError("Error in updating the ticket.", 500));
+    }
+  }
+);
+
+router.delete(
+  "/:id",
+  [requireAuth()],
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const ticketDeletedProducer = new TicketDeletedProducer(NATS.client);
+
+    try {
+      const ticket = await Ticket.findById(id);
+
+      if (!ticket) {
+        return next(new NotFoundError());
+      }
+
+      await ticket.deleteOne();
+
+      try {
+        const eventData: TicketDeletedEvent["data"] = {
+          id: ticket.id,
+          userId: ticket.userId,
+        };
+        await ticketDeletedProducer.publish(eventData);
+        logger.info(
+          "Ticket deleted event published",
+          JSON.stringify(eventData)
+        );
+      } catch (error) {
+        logger.error("Error in publishing the ticket deleted event.", error);
+      }
+
+      res.status(204).send({});
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        return next(error);
+      }
+      return next(new GenericError("Error in deleting the ticket.", 500));
     }
   }
 );

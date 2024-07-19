@@ -10,7 +10,15 @@ class _NATSClient {
     return this._client;
   }
 
-  connect(clusterId: string, clientId: string, url: string) {
+  connect(
+    clusterId: string,
+    clientId: string,
+    url: string,
+    opts: {
+      onConnect?: () => void;
+      onError?: (err: Error) => void;
+    } = {}
+  ) {
     if (this._client) {
       return;
     }
@@ -20,10 +28,12 @@ class _NATSClient {
 
     return new Promise((resolve, reject) => {
       this._client!.on("connect", () => {
+        opts?.onConnect?.();
         resolve(undefined);
       });
 
       this._client!.on("error", (err) => {
+        opts?.onError?.(err);
         reject(err);
       });
     });
