@@ -18,6 +18,7 @@ import {
 } from "../events/producers";
 import { NATS } from "floroz-ticketing-common";
 import { logger } from "../logger";
+import mongoose from "mongoose";
 
 const validationMiddleware = [
   body("title").not().isEmpty().isString().withMessage("Title is required"),
@@ -71,6 +72,8 @@ router.post(
     const ticketCreatedProducer = new TicketCreatedProducer(NATS.client);
 
     const { title, price, currency } = req.body;
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
     try {
       const ticket = await Ticket.build({
@@ -78,29 +81,20 @@ router.post(
         price,
         currency,
         userId: req.currentUser?.id,
-      }).save();
+      }).save({ session });
 
-      try {
-        const eventData: TicketCreatedEvent["data"] = {
-          id: ticket.id,
-          userId: ticket.userId,
-          title: ticket.title,
-          price: ticket.price,
-          currency: ticket.currency,
-          updatedAt: ticket.updatedAt,
-          createdAt: ticket.createdAt,
-        };
-        await ticketCreatedProducer.publish(eventData);
-        logger.info(
-          "Ticket created event published",
-          JSON.stringify(eventData)
-        );
-      } catch (error) {
-        logger.error("Error in publishing the ticket created event.", error);
-        return next(
-          new GenericError("Error in publishing the ticket created event.", 500)
-        );
-      }
+      const eventData: TicketCreatedEvent["data"] = {
+        id: ticket.id,
+        userId: ticket.userId,
+        title: ticket.title,
+        price: ticket.price,
+        currency: ticket.currency,
+        updatedAt: ticket.updatedAt,
+        createdAt: ticket.createdAt,
+      };
+      await ticketCreatedProducer.publish(eventData);
+      logger.info("Ticket created event published", JSON.stringify(eventData));
+      await session.commitTransaction();
 
       res.status(201).send({
         userId: ticket.userId,
@@ -112,11 +106,15 @@ router.post(
         updatedAt: ticket.updatedAt,
       });
     } catch (error) {
-      logger.error("Error in creating a ticket.", error);
+      await session.abortTransaction();
+
+      logger.error("Error in creating a ticket: transaction aborted.", error);
       if (error instanceof Error) {
         return next(new GenericError(error.message, 500));
       }
       return next(new GenericError("Error in creating a ticket.", 500));
+    } finally {
+      session.endSession();
     }
   }
 );
