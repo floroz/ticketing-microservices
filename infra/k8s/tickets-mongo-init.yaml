@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tickets-mongo-init
+spec:
+  template:
+    spec:
+      containers:
+      - name: tickets-mongo-init
+        image: mongo:4.4
+        command:
+        - /bin/bash
+        - -c
+        - |
+          until mongo --host tickets-mongo-srv --eval "print(\"waited for connection\")"
+          do
+            sleep 2
+          done
+          mongo --host tickets-mongo-srv --eval '
+            rs.initiate({
+              _id: "rs0",
+              members: [{ _id: 0, host: "tickets-mongo-srv:27017" }]
+            })
+          '
+      restartPolicy: OnFailure

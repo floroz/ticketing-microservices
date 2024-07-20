@@ -22,7 +22,7 @@ spec:
                   name: jwt-secret
                   key: JWT_SECRET
             - name: MONGO_URI
-              value: 'mongodb://auth-mongo-srv:27017/auth'
+              value: 'mongodb://auth-mongo-srv:27017/auth?replicaSet=rs0'
 ---
 apiVersion: v1
 kind: Service
