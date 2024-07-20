@@ -2,6 +2,7 @@ import request from "supertest";
 import { app } from "../../app";
 import { it, expect, vi, beforeEach, afterAll } from "vitest";
 import mongoose from "mongoose";
+import { Ticket } from "floroz-ticketing-common";
 
 vi.mock("floroz-ticketing-common", async () => ({
   ...(await vi.importActual("floroz-ticketing-common")),
@@ -175,6 +176,26 @@ it("returns 201 for POST /api/tickets - creates a new ticket", async () => {
   expect(ticketCreatePublish).toHaveBeenCalledTimes(1);
 });
 
+it("should revert the transaction of creating a new ticket if an error occurs with publishing", async () => {
+  const ticket = {
+    userId: "1234",
+    title: "a new ticket",
+    price: 10,
+    currency: "USD",
+  };
+
+  ticketCreatePublish.mockRejectedValueOnce(new Error("boom"));
+
+  await request(app)
+    .post("/api/tickets")
+    .set("Cookie", global.__get_cookie())
+    .send(ticket)
+    .expect(500);
+
+  // the record should not exist in the db
+  await expect(Ticket.findOne({ title: ticket.title })).resolves.toBeNull();
+});
+
 it("returns 200 for PUT /api/tickets/:id - when ticket is found", async () => {
   // create  ticket to update
   const res = await request(app)
@@ -265,6 +286,44 @@ it("returns 404 for PUT /api/tickets/:id - when ticket is not found", async () =
   expect(response.status).toBe(404);
 });
 
+it("should revert the transaction of updating a ticket if an error occurs with publishing", async () => {
+  const ticket = {
+    userId: "1234",
+    title: "a new ticket",
+    price: 10,
+    currency: "USD",
+  };
+
+  const res = await request(app)
+    .post("/api/tickets")
+    .set("Cookie", global.__get_cookie())
+    .send(ticket)
+    .expect(201);
+
+  const id = res.body.id;
+
+  const update = {
+    userId: "1234",
+    title: "test",
+    price: 15,
+    currency: "USD",
+  };
+
+  ticketUpdatePublish.mockRejectedValueOnce(new Error("boom"));
+
+  await request(app)
+    .put(`/api/tickets/${id}`)
+    .set("Cookie", global.__get_cookie())
+    .send(update)
+    .expect(500);
+
+  const savedTicket = await Ticket.findById(id);
+
+  // the update should have not gone through
+  expect(savedTicket?.title).toBe(ticket.title);
+  expect(savedTicket?.price).toBe(ticket.price);
+});
+
 it("returns 204 for DELETE /api/tickets/:id - when ticket is found", async () => {
   const ticket = {
     userId: "1234",
@@ -293,4 +352,31 @@ it("returns 404 for DELETE /api/tickets/:id - when ticket is not found", async (
     .delete("/api/tickets/" + id)
     .set("Cookie", global.__get_cookie())
     .expect(404);
+});
+
+it("should revert the transaction of deleting a ticket if an error occurs with publishing", async () => {
+  const ticket = {
+    userId: "1234",
+    title: "a new ticket",
+    price: 10,
+    currency: "USD",
+  };
+
+  // create ticket
+  const res = await request(app)
+    .post("/api/tickets")
+    .set("Cookie", global.__get_cookie())
+    .send(ticket)
+    .expect(201);
+
+  // delete it
+  ticketDeletePublish.mockRejectedValueOnce(new Error("boom"));
+  await request(app)
+    .delete("/api/tickets/" + res.body.id)
+    .set("Cookie", global.__get_cookie())
+    .expect(500);
+
+  // the ticket should still exist
+  const savedTicket = await Ticket.findById(res.body.id);
+  expect(savedTicket).not.toBeNull();
 });

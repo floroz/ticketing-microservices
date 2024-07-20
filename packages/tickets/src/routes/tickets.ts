@@ -114,7 +114,7 @@ router.post(
       }
       return next(new GenericError("Error in creating a ticket.", 500));
     } finally {
-      session.endSession();
+      await session.endSession();
     }
   }
 );
@@ -124,6 +124,9 @@ router.put(
   [requireAuth(), ...validationMiddleware],
   async (req: Request, res: Response, next: NextFunction) => {
     const ticketUpdatedProducer = new TicketUpdatedProducer(NATS.client);
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     const { title, price, currency } = req.body;
     const { id } = req.params;
 
@@ -141,7 +144,9 @@ router.put(
         return next(new ForbiddenError());
       }
 
-      const updated = await ticket.set({ title, price, currency }).save();
+      const updated = await ticket
+        .set({ title, price, currency })
+        .save({ session });
 
       const eventData: TicketUpdatedEvent["data"] = {
         id: updated.id,
@@ -152,21 +157,19 @@ router.put(
         createdAt: updated.createdAt,
         updatedAt: updated.updatedAt,
       };
-      try {
-        await ticketUpdatedProducer.publish(eventData);
-        logger.info(
-          "Ticket updated event published",
-          JSON.stringify(eventData)
-        );
-      } catch (error) {
-        logger.error("Error in publishing the ticket updated event.", error);
-      }
+      await ticketUpdatedProducer.publish(eventData);
+      logger.info("Ticket updated event published", JSON.stringify(eventData));
+      await session.commitTransaction();
+
       res.send(updated);
     } catch (error) {
+      await session.abortTransaction();
       if (error instanceof NotFoundError || error instanceof GenericError) {
         return next(error);
       }
       return next(new GenericError("Error in updating the ticket.", 500));
+    } finally {
+      await session.endSession();
     }
   }
 );
@@ -178,6 +181,9 @@ router.delete(
     const { id } = req.params;
     const ticketDeletedProducer = new TicketDeletedProducer(NATS.client);
 
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     try {
       const ticket = await Ticket.findById(id);
 
@@ -185,28 +191,26 @@ router.delete(
         return next(new NotFoundError());
       }
 
-      await ticket.deleteOne();
+      await ticket.deleteOne({ session });
 
-      try {
-        const eventData: TicketDeletedEvent["data"] = {
-          id: ticket.id,
-          userId: ticket.userId,
-        };
-        await ticketDeletedProducer.publish(eventData);
-        logger.info(
-          "Ticket deleted event published",
-          JSON.stringify(eventData)
-        );
-      } catch (error) {
-        logger.error("Error in publishing the ticket deleted event.", error);
-      }
+      const eventData: TicketDeletedEvent["data"] = {
+        id: ticket.id,
+        userId: ticket.userId,
+      };
+      await ticketDeletedProducer.publish(eventData);
+      logger.info("Ticket deleted event published", JSON.stringify(eventData));
+
+      await session.commitTransaction();
 
       res.status(204).send({});
     } catch (error) {
+      await session.abortTransaction();
       if (error instanceof NotFoundError) {
         return next(error);
       }
       return next(new GenericError("Error in deleting the ticket.", 500));
+    } finally {
+      await session.endSession();
     }
   }
 );
