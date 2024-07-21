@@ -4,26 +4,26 @@ import { NATS } from "floroz-ticketing-common";
 import { connectDB } from "./db/connect";
 
 const PORT = 3001;
-const clientId = process.env.NATS_CLIENT_ID || "tickets";
-const clusterId = process.env.NATS_CLUSTER_ID || "ticketing";
-const url = process.env.NATS_URL || "http://nats-srv.default:4222";
+const clientId = process.env.NATS_CLIENT_ID;
+const clusterId = process.env.NATS_CLUSTER_ID;
+const url = process.env.NATS_URL;
+
+if (!clientId || !clusterId || !url) {
+  throw new Error(
+    "NATS_CLIENT_ID, NATS_CLUSTER_ID and NATS_URL must be defined"
+  );
+}
+
+if (process.env.JWT_SECRET == null) {
+  throw new Error("JWT_SECRET must be defined");
+} else {
+  logger.info("JWT_Secret loaded.");
+}
 
 const main = async () => {
-  if (process.env.JWT_SECRET == null) {
-    throw new Error("JWT_SECRET must be defined");
-  } else {
-    logger.info("JWT_Secret loaded.");
-  }
-
   await connectDB();
 
-  try {
-    await NATS.connect(clusterId, clientId, url);
-    logger.info("NATS client connected");
-  } catch (error) {
-    logger.error("Error in connecting to NATS.", error);
-    throw error;
-  }
+  await NATS.connect(clusterId, clientId, url);
 
   NATS.client.on("close", () => {
     logger.info("NATS connection closed");

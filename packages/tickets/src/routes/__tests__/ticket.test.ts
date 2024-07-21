@@ -338,7 +338,7 @@ it("returns 204 for DELETE /api/tickets/:id - when ticket is found", async () =>
     .send(ticket)
     .expect(201);
 
-  const response = await request(app)
+  await request(app)
     .delete("/api/tickets/" + res.body.id)
     .set("Cookie", global.__get_cookie())
     .expect(204);
@@ -362,21 +362,18 @@ it("should revert the transaction of deleting a ticket if an error occurs with p
     currency: "USD",
   };
 
-  // create ticket
   const res = await request(app)
     .post("/api/tickets")
     .set("Cookie", global.__get_cookie())
     .send(ticket)
     .expect(201);
 
-  // delete it
   ticketDeletePublish.mockRejectedValueOnce(new Error("boom"));
   await request(app)
     .delete("/api/tickets/" + res.body.id)
     .set("Cookie", global.__get_cookie())
     .expect(500);
 
-  // the ticket should still exist
   const savedTicket = await Ticket.findById(res.body.id);
   expect(savedTicket).not.toBeNull();
 });
