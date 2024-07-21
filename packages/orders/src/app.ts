@@ -5,8 +5,10 @@ import {
   NotFoundError,
   currentUserMiddleware,
   errorHandlerMiddlewere,
+  requireAuth,
 } from "floroz-ticketing-common";
 import { jwtService } from "./services/jwt";
+import { ordersRouter } from "./routes/orders";
 
 const app = express();
 
@@ -27,10 +29,8 @@ app.use(express.json());
 
 app.use(
   "/api/orders",
-  [currentUserMiddleware(jwtService)],
-  (_: any, res: any) => {
-    res.send("Hello");
-  }
+  [currentUserMiddleware(jwtService), requireAuth()],
+  ordersRouter
 );
 
 app.use("*", () => {

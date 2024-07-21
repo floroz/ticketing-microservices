@@ -2,7 +2,7 @@ import request from "supertest";
 import { app } from "../../app";
 import { it, expect, vi, beforeEach, afterAll } from "vitest";
 import mongoose from "mongoose";
-import { Ticket } from "floroz-ticketing-common";
+import { Ticket } from "../../models/ticket";
 
 vi.mock("floroz-ticketing-common", async () => ({
   ...(await vi.importActual("floroz-ticketing-common")),

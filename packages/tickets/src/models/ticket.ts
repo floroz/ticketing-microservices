@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-type TicketCreationPayload = {
+type TicketCreationDTO = {
   title: string;
   price: number;
   currency: string;
@@ -8,7 +8,7 @@ type TicketCreationPayload = {
 };
 
 interface TicketModel extends mongoose.Model<TicketDoc> {
-  build(payload: TicketCreationPayload): TicketDoc;
+  build(ticket: TicketCreationDTO): TicketDoc;
 }
 
 interface TicketDoc extends mongoose.Document {
@@ -51,7 +51,7 @@ ticketSchema.set("toJSON", {
   },
 });
 
-ticketSchema.statics.build = (payload: TicketCreationPayload) => {
+ticketSchema.statics.build = (payload: TicketCreationDTO) => {
   return new Ticket(payload);
 };
 

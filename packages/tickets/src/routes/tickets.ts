@@ -3,7 +3,6 @@ import {
   GenericError,
   requireAuth,
   validateRequestMiddleware,
-  Ticket,
   NotFoundError,
   ForbiddenError,
   TicketCreatedEvent,
@@ -19,6 +18,7 @@ import {
 import { NATS } from "floroz-ticketing-common";
 import { logger } from "../logger";
 import mongoose from "mongoose";
+import { Ticket } from "../models/ticket";
 
 const validationMiddleware = [
   body("title").not().isEmpty().isString().withMessage("Title is required"),

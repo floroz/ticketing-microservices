@@ -1,13 +1,13 @@
 import mongoose from "mongoose";
 import { PasswordService } from "../services/password";
 
-type UserCreationPayload = {
+type UserCreationDTO = {
   email: string;
   password: string;
 };
 
 interface UserModel extends mongoose.Model<UserDoc> {
-  build(payload: UserCreationPayload): UserDoc;
+  build(user: UserCreationDTO): UserDoc;
 }
 
 export interface UserDoc extends mongoose.Document {
@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.set("toJSON", {
-  transform: (doc: any, ret: any) => {
+  transform: (_: any, ret: any) => {
     delete ret.password;
     delete ret.__v;
     ret.id = ret._id;
@@ -40,7 +40,7 @@ userSchema.set("toJSON", {
   },
 });
 
-userSchema.statics.build = (payload: UserCreationPayload) => {
+userSchema.statics.build = (payload: UserCreationDTO) => {
   return new User(payload);
 };
 
