@@ -15,6 +15,22 @@ spec:
       containers:
         - name: orders
           image: floroz/orders
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_SECRET
+            - name: MONGO_URI
+              value: 'mongodb://orders-mongo-srv:27017/orders?replicaSet=rs0'
+            - name: NATS_URL
+              value: 'http://nats-srv.default:4222'
+            - name: NATS_CLUSTER_ID
+              value: 'ticketing'
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
 ---
 apiVersion: v1
 kind: Service
