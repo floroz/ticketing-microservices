@@ -1,4 +1,6 @@
+import { OrderStatus } from "floroz-ticketing-common";
 import mongoose from "mongoose";
+import type { TicketDoc } from "./ticket";
 
 type OrderCreationDTO = {
   ticket: TicketDoc;
@@ -29,6 +31,7 @@ const orderSchema = new mongoose.Schema(
     status: {
       type: String,
       required: true,
+      enum: Object.values(OrderStatus),
     },
     expiresAt: {
       type: mongoose.Schema.Types.Date,
@@ -50,10 +53,10 @@ orderSchema.set("toJSON", {
   },
 });
 
-const Order = mongoose.model<OrderDoc, OrderModel>("Order", orderSchema);
-
 orderSchema.statics.build = (payload: OrderCreationDTO) => {
   return new Order(payload);
 };
+
+const Order = mongoose.model<OrderDoc, OrderModel>("Order", orderSchema);
 
 export { Order };

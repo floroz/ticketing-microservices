@@ -1,8 +1,17 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import { body } from "express-validator";
 import mongoose from "mongoose";
 import { logger } from "../logger";
-import { NATS } from "floroz-ticketing-common";
+import {
+  BadRequestError,
+  NotFoundError,
+  OrderStatus,
+  validateRequestMiddleware,
+} from "floroz-ticketing-common";
+import { Ticket } from "../models/ticket";
+import { Order } from "../models/order";
+
+const EXPIRATION_MS_SECONDS = 15 * 60 * 1000;
 
 const router = Router();
 
@@ -14,14 +23,54 @@ router.post(
   "/",
   [
     body("ticketId")
-      .not()
-      .isEmpty()
+      .exists()
+      .notEmpty()
       .withMessage("Ticket ID is required")
-      .custom((input: string) => mongoose.Types.ObjectId.isValid(input))
+      .isMongoId()
       .withMessage("Invalid ticket ID"),
+    validateRequestMiddleware,
   ],
-  (req: Request, res: Response) => {
-    res.send("Hello");
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { ticketId } = req.body;
+    const session = await mongoose.startSession();
+
+    session.startTransaction();
+    try {
+      const ticket = await Ticket.findById(ticketId);
+
+      // check that ticket exists
+      if (!ticket) {
+        throw new NotFoundError();
+      }
+
+      const existingOrder = await ticket.isReserved();
+
+      if (existingOrder) {
+        throw new BadRequestError("Ticket is already reserved.");
+      }
+
+      const expiresAt = new Date(Date.now() + EXPIRATION_MS_SECONDS); // 15 minutes expiration
+
+      const order = Order.build({
+        ticket: ticket,
+        userId: req.currentUser?.id,
+        expiresAt,
+        status: OrderStatus.Created,
+      });
+      await order.save({ session });
+
+      // TODO: publish created order
+
+      await session.commitTransaction();
+
+      return res.status(201).send({});
+    } catch (error) {
+      logger.error(error, "Error creating the order.");
+      await session.abortTransaction();
+      return next(error);
+    } finally {
+      await session.endSession();
+    }
   }
 );
 
