@@ -13,8 +13,8 @@ export type TicketCreatedEvent = {
     title: string;
     price: number;
     currency: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string;
+    updatedAt: string;
   };
 };
 
@@ -26,8 +26,8 @@ export type TicketUpdatedEvent = {
     title: string;
     price: number;
     currency: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string;
+    updatedAt: string;
   };
 };
 
@@ -36,5 +36,32 @@ export type TicketDeletedEvent = {
   data: {
     id: string;
     userId: string;
+  };
+};
+
+export type OrderCreatedEvent = {
+  topic: Topics.OrderCreated;
+  data: {
+    id: string;
+    userId: string;
+    ticket: {
+      id: string;
+      price: number;
+      currency: string;
+    };
+    expiresAt: string;
+  };
+};
+
+export type OrderDeletedEvent = {
+  topic: Topics.OrderCancelled;
+  data: {
+    id: string;
+    userId: string;
+    ticket: {
+      id: string;
+      price: number;
+      currency: string;
+    };
   };
 };

@@ -89,8 +89,8 @@ router.post(
         title: ticket.title,
         price: ticket.price,
         currency: ticket.currency,
-        updatedAt: ticket.updatedAt,
-        createdAt: ticket.createdAt,
+        updatedAt: ticket.updatedAt.toISOString(),
+        createdAt: ticket.createdAt.toISOString(),
       };
       await ticketCreatedProducer.publish(eventData);
       logger.info("Ticket created event published", JSON.stringify(eventData));
@@ -154,8 +154,8 @@ router.put(
         price: updated.price,
         currency: updated.currency,
         userId: updated.userId,
-        createdAt: updated.createdAt,
-        updatedAt: updated.updatedAt,
+        createdAt: updated.createdAt.toISOString(),
+        updatedAt: updated.updatedAt.toISOString(),
       };
       await ticketUpdatedProducer.publish(eventData);
       logger.info("Ticket updated event published", JSON.stringify(eventData));
