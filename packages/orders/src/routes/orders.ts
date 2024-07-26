@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import { logger } from "../logger";
 import {
   BadRequestError,
+  NATS,
   NotFoundError,
   OrderStatus,
   UnauthorizedError,
@@ -11,6 +12,10 @@ import {
 } from "floroz-ticketing-common";
 import { Ticket } from "../models/ticket";
 import { Order } from "../models/order";
+import {
+  OrderCancelledProducer,
+  OrderCreatedProducer,
+} from "../events/producers";
 
 const EXPIRATION_MS_SECONDS = 15 * 60 * 1000;
 
@@ -87,7 +92,20 @@ router.post(
       });
       await order.save({ session });
 
-      // TODO: publish created order
+      const producer = new OrderCreatedProducer(NATS.client);
+
+      await producer.publish({
+        expiresAt: order.expiresAt.toISOString(),
+        id: order.id,
+        userId: req.currentUser?.id,
+        ticket: {
+          currency: ticket.currency,
+          id: ticket.id,
+          price: ticket.price,
+        },
+      });
+
+      console.log("PUBLISHED DIDN'T THROW!");
 
       await session.commitTransaction();
 
@@ -120,6 +138,8 @@ router.patch(
     const { id } = req.params;
     const { status } = req.body;
 
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try {
       const order = await Order.findById(id).populate("ticket");
       if (!order) {
@@ -131,12 +151,26 @@ router.patch(
       }
 
       order.status = status;
-      // TODO: publish updated order
-      await order.save();
+      await order.save({ session });
+      const producer = new OrderCancelledProducer(NATS.client);
+
+      await producer.publish({
+        id: order.id,
+        ticket: {
+          currency: order.ticket.currency,
+          id: order.ticket.id,
+          price: order.ticket.price,
+        },
+        userId: req.currentUser.id,
+      });
+      await session.commitTransaction();
       return res.status(200).send(order);
     } catch (error) {
+      await session.abortTransaction;
       logger.error(error, "Error patching the order.");
       return next(error);
+    } finally {
+      await session.endSession();
     }
   }
 );

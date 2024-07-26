@@ -11,18 +11,6 @@ vi.mock("floroz-ticketing-common", async () => ({
   },
 }));
 
-vi.mock("../../events/producers", () => ({
-  TicketCreatedProducer: vi.fn().mockImplementation(() => ({
-    publish: vi.fn(),
-  })),
-  TicketUpdatedProducer: vi.fn().mockImplementation(() => ({
-    publish: vi.fn(),
-  })),
-  TicketDeletedProducer: vi.fn().mockImplementation(() => ({
-    publish: vi.fn(),
-  })),
-}));
-
 const ticketCreatePublish = vi.fn();
 const ticketUpdatePublish = vi.fn();
 const ticketDeletePublish = vi.fn();

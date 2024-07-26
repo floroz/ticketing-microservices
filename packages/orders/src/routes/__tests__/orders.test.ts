@@ -6,6 +6,25 @@ import { Ticket } from "../../models/ticket";
 import { Order } from "../../models/order";
 import { OrderStatus } from "floroz-ticketing-common";
 
+vi.mock("floroz-ticketing-common", async () => ({
+  ...(await vi.importActual("floroz-ticketing-common")),
+  NATS: {
+    connect: vi.fn(),
+  },
+}));
+
+const orderCreatePublish = vi.fn();
+const orderCancelledPublish = vi.fn();
+
+vi.mock("../../events/producers", () => ({
+  OrderCreatedProducer: vi.fn().mockImplementation(() => ({
+    publish: orderCreatePublish,
+  })),
+  OrderCancelledProducer: vi.fn().mockImplementation(() => ({
+    publish: orderCancelledPublish,
+  })),
+}));
+
 describe("POST /orders", () => {
   it("should return 401 if the user is not authenticated", async () => {
     await request(app).get("/api/orders").expect(401);
@@ -97,6 +116,26 @@ describe("POST /orders", () => {
       .expect(201);
 
     expect(response.body.ticket.id).toEqual(ticket.id);
+    expect(orderCreatePublish).toHaveBeenCalledTimes(1);
+  });
+
+  it("should abort the db transaction when there is an issue in publishing", async () => {
+    const ticket = await Ticket.create({
+      title: "Concert",
+      price: 20,
+      currency: "USD",
+      version: 0,
+    });
+
+    orderCreatePublish.mockRejectedValueOnce(new Error("BOOM!"));
+
+    await request(app)
+      .post("/api/orders")
+      .set("Cookie", global.__get_cookie())
+      .send({
+        ticketId: ticket.id,
+      })
+      .expect(500);
   });
 });
 
@@ -262,5 +301,37 @@ describe("PATCH /orders/:id", () => {
 
     expect(patchResponse.body.status).toEqual(OrderStatus.Cancelled);
     expect(patchResponse.body.ticket.id).toEqual(ticket.id);
+    expect(orderCancelledPublish).toHaveBeenCalledTimes(1);
+  });
+
+  it("should abort the db transaction when there is an issue in publishing", async () => {
+    const ticket = await Ticket.create({
+      title: "Concert",
+      price: 20,
+      currency: "USD",
+      version: 0,
+    });
+
+    const postResponse = await request(app)
+      .post("/api/orders")
+      .set("Cookie", global.__get_cookie())
+      .send({
+        ticketId: ticket.id,
+      })
+      .expect(201);
+
+    orderCancelledPublish.mockRejectedValueOnce(new Error("Error publishing"));
+
+    await request(app)
+      .patch(`/api/orders/${postResponse.body.id}`)
+      .set("Cookie", global.__get_cookie())
+      .send({
+        status: OrderStatus.Cancelled,
+      })
+      .expect(500);
+
+    const order = await Order.findById(postResponse.body.id);
+
+    expect(order?.status).not.toEqual(OrderStatus.Cancelled);
   });
 });
