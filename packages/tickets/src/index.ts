@@ -21,14 +21,13 @@ if (process.env.JWT_SECRET == null) {
 }
 
 const main = async () => {
-  await connectDB();
-
-  await NATS.connect(clusterId, clientId, url);
-
-  NATS.client.on("close", () => {
-    logger.info("NATS connection closed");
-    process.exit(0);
-  });
+  try {
+    await connectDB();
+    await NATS.connect(clusterId, clientId, url);
+    logger.info("NATS connected");
+  } catch (error) {
+    logger.error(error);
+  }
 
   NATS.client.on("close", () => {
     logger.info("NATS connection closed");

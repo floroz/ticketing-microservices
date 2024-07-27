@@ -3,6 +3,7 @@ import { Order } from "./order";
 import { OrderStatus } from "floroz-ticketing-common";
 
 type TicketDTO = {
+  id: string;
   title: string;
   price: number;
   currency: string;
@@ -69,7 +70,14 @@ ticketSchema.methods.isReserved = async function isReserved() {
 };
 
 ticketSchema.statics.build = (payload: TicketDTO) => {
-  return new Ticket(payload);
+  const ticket: Omit<TicketDTO, "id"> & { _id: string } = {
+    currency: payload.currency,
+    price: payload.price,
+    title: payload.title,
+    _id: payload.id,
+    version: payload.version,
+  };
+  return new Ticket(ticket);
 };
 
 const Ticket = mongoose.model<TicketDoc, TicketModel>("Ticket", ticketSchema);

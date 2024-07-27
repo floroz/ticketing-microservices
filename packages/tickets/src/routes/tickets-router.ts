@@ -67,7 +67,7 @@ router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
 
 router.post(
   "/",
-  [requireAuth(), ...validationMiddleware],
+  [...validationMiddleware],
   async (req: Request, res: Response, next: NextFunction) => {
     const ticketCreatedProducer = new TicketCreatedProducer(NATS.client);
 
@@ -121,7 +121,7 @@ router.post(
 
 router.put(
   "/:id",
-  [requireAuth(), ...validationMiddleware],
+  [...validationMiddleware],
   async (req: Request, res: Response, next: NextFunction) => {
     const ticketUpdatedProducer = new TicketUpdatedProducer(NATS.client);
     const session = await mongoose.startSession();
@@ -176,7 +176,6 @@ router.put(
 
 router.delete(
   "/:id",
-  [requireAuth()],
   async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     const ticketDeletedProducer = new TicketDeletedProducer(NATS.client);

@@ -5,8 +5,9 @@ import {
   NotFoundError,
   currentUserMiddleware,
   errorHandlerMiddlewere,
+  requireAuth,
 } from "floroz-ticketing-common";
-import { ticketRouter } from "./routes/tickets";
+import { ticketRouter } from "./routes/tickets-router";
 import { jwtService } from "./services/jwt";
 
 const app = express();
@@ -26,7 +27,11 @@ app.use(
 
 app.use(express.json());
 
-app.use("/api/tickets", [currentUserMiddleware(jwtService)], ticketRouter);
+app.use(
+  "/api/tickets",
+  [currentUserMiddleware(jwtService), requireAuth()],
+  ticketRouter
+);
 
 app.use("*", () => {
   throw new NotFoundError();

@@ -2,6 +2,11 @@ import { app } from "./app";
 import { logger } from "./logger";
 import { NATS } from "floroz-ticketing-common";
 import { connectDB } from "./db/connect";
+import {
+  TicketCreatedConsumer,
+  TicketDeletedConsumer,
+  TicketUpdatedConsumer,
+} from "./consumers/tickets-consumers";
 
 const PORT = 3002;
 const clientId = process.env.NATS_CLIENT_ID;
@@ -22,14 +27,16 @@ if (process.env.JWT_SECRET == null) {
 
 const main = async () => {
   await connectDB();
-
   await NATS.connect(clusterId, clientId, url);
   logger.info("NATS connected");
 
-  NATS.client.on("close", () => {
-    logger.info("NATS connection closed");
-    process.exit(0);
-  });
+  const ticketCreatedConsumer = new TicketCreatedConsumer(NATS.client);
+  const ticketUpdatedConsumer = new TicketUpdatedConsumer(NATS.client);
+  const ticketDeletedConsumer = new TicketDeletedConsumer(NATS.client);
+
+  ticketCreatedConsumer.listen();
+  ticketUpdatedConsumer.listen();
+  ticketDeletedConsumer.listen();
 
   NATS.client.on("close", () => {
     logger.info("NATS connection closed");

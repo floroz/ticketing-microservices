@@ -141,6 +141,10 @@ router.patch(
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new BadRequestError("Invalid order ID");
+      }
+
       const order = await Order.findById(id).populate("ticket");
       if (!order) {
         throw new NotFoundError();
