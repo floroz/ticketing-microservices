@@ -141,9 +141,20 @@ router.put(
         return next(new NotFoundError());
       }
 
+      console.log({
+        userId,
+        ticketUserId: ticket.userId,
+      });
+
       // prevent updating if the user is not the owner of the ticket
       if (userId !== ticket?.userId) {
         return next(new ForbiddenError());
+      }
+
+      if (ticket.linkedToOrderId) {
+        return next(
+          new ForbiddenError("Cannot update a ticket that is reserved.")
+        );
       }
 
       const updated = await ticket

@@ -2,6 +2,10 @@ import { app } from "./app";
 import { logger } from "./logger";
 import { NATS } from "floroz-ticketing-common";
 import { connectDB } from "./db/connect";
+import {
+  OrderCancelledConsumer,
+  OrderCreatedConsumer,
+} from "./events/orders-consumers";
 
 const PORT = 3001;
 const clientId = process.env.NATS_CLIENT_ID;
@@ -28,6 +32,10 @@ const main = async () => {
   } catch (error) {
     logger.error(error);
   }
+
+  new OrderCreatedConsumer(NATS.client).listen();
+
+  new OrderCancelledConsumer(NATS.client).listen();
 
   NATS.client.on("close", () => {
     logger.info("NATS connection closed");

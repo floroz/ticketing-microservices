@@ -97,6 +97,8 @@ router.post(
         expiresAt: order.expiresAt.toISOString(),
         id: order.id,
         userId: req.currentUser?.id,
+        status: OrderStatus.Created,
+        version: order.__v!,
         ticket: {
           currency: ticket.currency,
           id: ticket.id,
@@ -163,6 +165,8 @@ router.patch(
           price: order.ticket.price,
         },
         userId: req.currentUser.id,
+        status: OrderStatus.Cancelled,
+        expiresAt: order.expiresAt.toISOString(),
       });
       await session.commitTransaction();
       return res.status(200).send(order);

@@ -5,6 +5,7 @@ type TicketCreationDTO = {
   price: number;
   currency: string;
   userId: string;
+  linkedToOrderId?: string;
 };
 
 interface TicketModel extends mongoose.Model<TicketDoc> {
@@ -16,6 +17,7 @@ interface TicketDoc extends mongoose.Document {
   price: number;
   currency: string;
   userId: string;
+  linkedToOrderId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -37,6 +39,9 @@ const ticketSchema = new mongoose.Schema(
     userId: {
       type: String,
       required: true,
+    },
+    linkedToOrderId: {
+      type: mongoose.Schema.Types.ObjectId,
     },
   },
   {

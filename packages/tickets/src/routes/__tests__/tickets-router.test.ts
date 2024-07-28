@@ -266,6 +266,35 @@ it("returns 403 for PUT /api/tickets/:id - when user is not allowed to update", 
     .expect(403);
 });
 
+it("returns 403 for PUT /api/tickets/:id - when ticket is reserved", async () => {
+  const ticket = {
+    // TODO: refactor - we need to get the correct user id from the __get_cookie
+    userId: "123123",
+    title: "test",
+    price: 10,
+    currency: "USD",
+    linkedToOrderId: new mongoose.Types.ObjectId().toHexString(),
+  };
+
+  // save a ticket that is marked as reserved (linkedToOrderId)
+  const savedTicket = await Ticket.build(ticket).save();
+
+  // try to update the ticket
+  const response = await request(app)
+    .put("/api/tickets/" + savedTicket.id)
+    .set("Cookie", global.__get_cookie())
+    .send({
+      ...ticket,
+      id: savedTicket.id,
+      price: 500,
+    })
+    .expect(403);
+
+  expect(response.body.errors[0].message).toBe(
+    "Cannot update a ticket that is reserved."
+  );
+});
+
 it("returns 404 for PUT /api/tickets/:id - when ticket is not found", async () => {
   const ticketId = new mongoose.Types.ObjectId().toHexString();
   const response = await request(app)
