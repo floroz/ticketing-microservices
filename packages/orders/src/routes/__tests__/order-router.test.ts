@@ -16,7 +16,7 @@ vi.mock("floroz-ticketing-common", async () => ({
 const orderCreatePublish = vi.fn();
 const orderCancelledPublish = vi.fn();
 
-vi.mock("../../events/order-producers", () => ({
+vi.mock("../../events/orders-producers", () => ({
   OrderCreatedProducer: vi.fn().mockImplementation(() => ({
     publish: orderCreatePublish,
   })),
