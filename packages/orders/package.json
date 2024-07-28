@@ -16,7 +16,7 @@
     "cookie-session": "^2.1.0",
     "express": "^4.18.3",
     "express-validator": "^7.0.1",
-    "floroz-ticketing-common": "^1.0.45",
+    "floroz-ticketing-common": "^1.0.46",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.2.2",
     "morgan": "^1.10.0",
