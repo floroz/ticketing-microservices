@@ -17,25 +17,35 @@ export class TicketCreatedConsumer extends Consumer<TicketCreatedEvent> {
   readonly topic = Topics.TicketCreated;
 
   async onMessage(data: TicketCreatedEvent["data"], message: Message) {
-    // check if version is the next in sequence
-    // if not, abort
-    // TODO: implement
-    const lastVersion = 1; /*TODO */
-
-    // create new ticket
-    const ticket = Ticket.build({
-      id: data.id,
-      title: data.title,
-      price: data.price,
-      currency: data.currency,
-      version: -1,
-    });
-
     try {
+      // prevent concurrency issues by checking the version
+      const nextVersion = 0;
+
+      if (data.version !== 0) {
+        logger.error(
+          `${QUEUE_GROUP_NAME}: Ticket version mismatch. Expected ${nextVersion} but got ${data.version}`
+        );
+        throw new Error("Ticket version mismatch");
+      }
+
+      logger.info(
+        `${QUEUE_GROUP_NAME}: Received TicketCreatedEvent version: ${data.version}`,
+        data
+      );
+
+      // create new ticket
+      const ticket = Ticket.build({
+        id: data.id,
+        title: data.title,
+        price: data.price,
+        currency: data.currency,
+      });
       await ticket.save({});
       logger.info(`${QUEUE_GROUP_NAME}: Ticket created`, ticket);
       message.ack();
-    } catch (error) {}
+    } catch (error) {
+      logger.error(error, "Error creating ticket");
+    }
   }
 }
 export class TicketUpdatedConsumer extends Consumer<TicketUpdatedEvent> {
@@ -47,17 +57,35 @@ export class TicketUpdatedConsumer extends Consumer<TicketUpdatedEvent> {
     message: Message
   ): Promise<void> {
     try {
-      const ticket = await Ticket.findById({
-        _id: data.id,
-        // version: data.version - 1,
-      });
+      // prevent concurrency issues by checking the version
+      const ticket = await Ticket.findById(data.id);
 
       if (!ticket) {
         throw new NotFoundError("Ticket not found");
       }
 
-      await ticket.set("price", data.price).set("title", data.title).save();
-      logger.info(`${QUEUE_GROUP_NAME}: Ticket updated`, ticket);
+      const nextVersion = ticket.__v + 1;
+
+      if (nextVersion !== data.version) {
+        logger.error(
+          `${QUEUE_GROUP_NAME}: Ticket version mismatch. Expected ${nextVersion} but got ${data.version}`
+        );
+        throw new Error("Ticket version mismatch");
+      }
+
+      logger.info(
+        `${QUEUE_GROUP_NAME}: Received TicketUpdatedEvent version: ${data.version} for ticket ${data.id}`,
+        ticket
+      );
+
+      await ticket
+        .set({
+          title: data.title,
+          price: data.price,
+          currency: data.currency,
+        })
+        .save();
+      logger.info(`${QUEUE_GROUP_NAME}: Ticket updated: ${data.id}`);
 
       message.ack();
     } catch (error) {
