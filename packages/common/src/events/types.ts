@@ -15,6 +15,7 @@ export type TicketCreatedEvent = {
     currency: string;
     createdAt: string;
     updatedAt: string;
+    version: number;
   };
 };
 
@@ -28,6 +29,7 @@ export type TicketUpdatedEvent = {
     currency: string;
     createdAt: string;
     updatedAt: string;
+    version: number;
   };
 };
 
@@ -36,6 +38,7 @@ export type TicketDeletedEvent = {
   data: {
     id: string;
     userId: string;
+    version: number;
   };
 };
 

@@ -1,7 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 import {
   GenericError,
-  requireAuth,
   validateRequestMiddleware,
   NotFoundError,
   ForbiddenError,
@@ -14,7 +13,7 @@ import {
   TicketCreatedProducer,
   TicketUpdatedProducer,
   TicketDeletedProducer,
-} from "../events/producers";
+} from "../events/ticket-producers";
 import { NATS } from "floroz-ticketing-common";
 import { logger } from "../logger";
 import mongoose from "mongoose";
@@ -91,6 +90,7 @@ router.post(
         currency: ticket.currency,
         updatedAt: ticket.updatedAt.toISOString(),
         createdAt: ticket.createdAt.toISOString(),
+        version: ticket.__v,
       };
       await ticketCreatedProducer.publish(eventData);
       logger.info("Ticket created event published", JSON.stringify(eventData));
@@ -156,6 +156,7 @@ router.put(
         userId: updated.userId,
         createdAt: updated.createdAt.toISOString(),
         updatedAt: updated.updatedAt.toISOString(),
+        version: updated.__v,
       };
       await ticketUpdatedProducer.publish(eventData);
       logger.info("Ticket updated event published", JSON.stringify(eventData));
@@ -195,6 +196,7 @@ router.delete(
       const eventData: TicketDeletedEvent["data"] = {
         id: ticket.id,
         userId: ticket.userId,
+        version: ticket.__v,
       };
       await ticketDeletedProducer.publish(eventData);
       logger.info("Ticket deleted event published", JSON.stringify(eventData));

@@ -7,7 +7,6 @@ type TicketDTO = {
   title: string;
   price: number;
   currency: string;
-  version: number;
 };
 
 interface TicketModel extends mongoose.Model<TicketDoc> {
@@ -18,7 +17,6 @@ interface TicketDoc extends mongoose.Document {
   title: string;
   price: number;
   currency: string;
-  version: number;
   createdAt: Date;
   updatedAt: Date;
   isReserved(): boolean;
@@ -36,10 +34,6 @@ const ticketSchema = new mongoose.Schema(
     },
     currency: {
       type: String,
-      required: true,
-    },
-    version: {
-      type: Number,
       required: true,
     },
   },
@@ -75,7 +69,6 @@ ticketSchema.statics.build = (payload: TicketDTO) => {
     price: payload.price,
     title: payload.title,
     _id: payload.id,
-    version: payload.version,
   };
   return new Ticket(ticket);
 };
