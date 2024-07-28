@@ -8,7 +8,7 @@ import {
   requireAuth,
 } from "floroz-ticketing-common";
 import { jwtService } from "./services/jwt";
-import { ordersRouter } from "./routes/orders";
+import { ordersRouter } from "./routes/orders-router";
 
 const app = express();
 

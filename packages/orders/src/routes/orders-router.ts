@@ -15,7 +15,7 @@ import { Order } from "../models/order-model";
 import {
   OrderCancelledProducer,
   OrderCreatedProducer,
-} from "../events/order-producers";
+} from "../events/orders-producers";
 
 const EXPIRATION_MS_SECONDS = 15 * 60 * 1000;
 
