@@ -89,16 +89,12 @@ ticketSchema.statics.findByEvent = async function findByEvent(event: {
   });
 };
 
-ticketSchema.statics.build = (payload: TicketDTO) => {
+ticketSchema.statics.build = ({ id, ...rest }: TicketDTO) => {
   const ticket: Omit<TicketDTO, "id"> & {
     _id: string;
   } = {
-    currency: payload.currency,
-    price: payload.price,
-    title: payload.title,
-    _id: payload.id,
-    version: payload.version,
-    userId: payload.userId,
+    ...rest,
+    _id: id,
   };
   return new Ticket(ticket);
 };
