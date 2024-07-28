@@ -15,7 +15,7 @@ import { Order } from "../models/order";
 import {
   OrderCancelledProducer,
   OrderCreatedProducer,
-} from "../events/producers";
+} from "../events/order-producers";
 
 const EXPIRATION_MS_SECONDS = 15 * 60 * 1000;
 
@@ -71,7 +71,6 @@ router.post(
     try {
       const ticket = await Ticket.findById(ticketId);
 
-      // check that ticket exists
       if (!ticket) {
         throw new NotFoundError();
       }
@@ -104,8 +103,6 @@ router.post(
           price: ticket.price,
         },
       });
-
-      console.log("PUBLISHED DIDN'T THROW!");
 
       await session.commitTransaction();
 

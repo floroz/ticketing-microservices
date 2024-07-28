@@ -6,7 +6,7 @@ import {
   TicketCreatedConsumer,
   TicketDeletedConsumer,
   TicketUpdatedConsumer,
-} from "./consumers/tickets-consumers";
+} from "./events/tickets-consumers";
 
 const PORT = 3002;
 const clientId = process.env.NATS_CLIENT_ID;
