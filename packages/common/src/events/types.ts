@@ -1,3 +1,4 @@
+import { OrderStatus } from "../types";
 import { Topics } from "./topics";
 
 export type BaseCustomEvent = {
@@ -47,6 +48,7 @@ export type OrderCreatedEvent = {
   data: {
     id: string;
     userId: string;
+    status: OrderStatus.Created;
     ticket: {
       id: string;
       price: number;
@@ -62,6 +64,7 @@ export type OrderUpdatedEvent = {
   data: {
     id: string;
     userId: string;
+    status: OrderStatus;
     ticket: {
       id: string;
       price: number;
@@ -77,11 +80,13 @@ export type OrderCancelledEvent = {
   data: {
     id: string;
     userId: string;
+    status: OrderStatus.Cancelled;
     ticket: {
       id: string;
       price: number;
       currency: string;
     };
+    expiresAt: string;
   };
   version: number;
 };
