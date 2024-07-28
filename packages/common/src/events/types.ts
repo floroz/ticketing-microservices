@@ -53,10 +53,26 @@ export type OrderCreatedEvent = {
       currency: string;
     };
     expiresAt: string;
+    version: number;
   };
 };
 
-export type OrderDeletedEvent = {
+export type OrderUpdatedEvent = {
+  topic: Topics.OrderCreated;
+  data: {
+    id: string;
+    userId: string;
+    ticket: {
+      id: string;
+      price: number;
+      currency: string;
+    };
+    expiresAt: string;
+    version: number;
+  };
+};
+
+export type OrderCancelledEvent = {
   topic: Topics.OrderCancelled;
   data: {
     id: string;
@@ -67,4 +83,5 @@ export type OrderDeletedEvent = {
       currency: string;
     };
   };
+  version: number;
 };
