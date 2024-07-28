@@ -58,7 +58,7 @@ export type OrderCreatedEvent = {
 };
 
 export type OrderUpdatedEvent = {
-  topic: Topics.OrderCreated;
+  topic: Topics.OrderUpdated;
   data: {
     id: string;
     userId: string;
