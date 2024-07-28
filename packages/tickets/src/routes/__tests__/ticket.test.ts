@@ -15,7 +15,7 @@ const ticketCreatePublish = vi.fn();
 const ticketUpdatePublish = vi.fn();
 const ticketDeletePublish = vi.fn();
 
-vi.mock("../../events/producers", () => ({
+vi.mock("../../events/ticket-producers", () => ({
   TicketCreatedProducer: vi.fn().mockImplementation(() => ({
     publish: ticketCreatePublish,
   })),
@@ -63,7 +63,10 @@ it("returns 200 for GET /api/tickets", async () => {
     .expect(201);
 
   // get all tickets
-  const response = await request(app).get("/api/tickets").expect(200);
+  const response = await request(app)
+    .get("/api/tickets")
+    .set("Cookie", global.__get_cookie())
+    .expect(200);
 
   expect(ticketCreatePublish).toHaveBeenCalledTimes(2);
 
@@ -73,7 +76,10 @@ it("returns 200 for GET /api/tickets", async () => {
 });
 
 it("returns 200 and an empty collection for GET /api/tickets - when empty", async () => {
-  const res = await request(app).get("/api/tickets").expect(200);
+  const res = await request(app)
+    .get("/api/tickets")
+    .set("Cookie", global.__get_cookie())
+    .expect(200);
 
   expect(res.body.tickets).toEqual([]);
 });

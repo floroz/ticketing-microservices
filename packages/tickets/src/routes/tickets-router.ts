@@ -75,12 +75,14 @@ router.post(
     session.startTransaction();
 
     try {
-      const ticket = await Ticket.build({
+      const ticket = Ticket.build({
         title,
         price,
         currency,
         userId: req.currentUser?.id,
-      }).save({ session });
+      });
+
+      await ticket.save({ session });
 
       const eventData: TicketCreatedEvent["data"] = {
         id: ticket.id,
