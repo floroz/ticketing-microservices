@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node-dev --poll src/index.ts",
-    "test": "JWT_SECRET=test vitest"
+    "test": "JWT_SECRET=test vitest --coverage",
+    "test:ci": "JWT_SECRET=test vitest run"
   },
   "keywords": [],
   "author": "",
@@ -30,6 +31,7 @@
     "@types/jsonwebtoken": "^9.0.6",
     "@types/morgan": "^1.9.9",
     "@types/supertest": "^6.0.2",
+    "@vitest/coverage-v8": "^1.3.1",
     "mongodb-memory-server": "^9.1.7",
     "pino-pretty": "^11.2.1",
     "supertest": "^6.3.4",

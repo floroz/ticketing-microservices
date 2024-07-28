@@ -2,3 +2,4 @@ node_modules
 packages/**/skaffold
 .DS_Store
 dist
+**/coverage/**

@@ -5,7 +5,8 @@
   "main": "index.js",
   "devDependencies": {},
   "scripts": {
-    "start:all": "pnpm -r exec -- pnpm start",
+    "start:all": "pnpm -r --no-bail pnpm start",
+    "test": "pnpm -r test:ci",
     "dev": "skaffold dev"
   },
   "keywords": [],
