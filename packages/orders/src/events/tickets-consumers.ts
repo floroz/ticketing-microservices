@@ -39,6 +39,8 @@ export class TicketCreatedConsumer extends Consumer<TicketCreatedEvent> {
         title: data.title,
         price: data.price,
         currency: data.currency,
+        version: data.version,
+        userId: data.userId,
       });
       await ticket.save({});
       logger.info(`${QUEUE_GROUP_NAME}: Ticket created`, ticket);
@@ -57,20 +59,14 @@ export class TicketUpdatedConsumer extends Consumer<TicketUpdatedEvent> {
     message: Message
   ): Promise<void> {
     try {
-      // prevent concurrency issues by checking the version
-      const ticket = await Ticket.findById(data.id);
+      const ticket = await Ticket.findOne({
+        _id: data.id,
+        // prevent concurrency issues by checking the version
+        version: data.version - 1,
+      });
 
       if (!ticket) {
         throw new NotFoundError("Ticket not found");
-      }
-
-      const nextVersion = ticket.__v + 1;
-
-      if (nextVersion !== data.version) {
-        logger.error(
-          `${QUEUE_GROUP_NAME}: Ticket version mismatch. Expected ${nextVersion} but got ${data.version}`
-        );
-        throw new Error("Ticket version mismatch");
       }
 
       logger.info(
@@ -83,6 +79,8 @@ export class TicketUpdatedConsumer extends Consumer<TicketUpdatedEvent> {
           title: data.title,
           price: data.price,
           currency: data.currency,
+          version: data.version,
+          userId: data.userId,
         })
         .save();
       logger.info(`${QUEUE_GROUP_NAME}: Ticket updated: ${data.id}`);

@@ -74,6 +74,7 @@ describe("POST /orders", () => {
       title: "Concert",
       price: 20,
       currency: "USD",
+      userId: "123",
       version: 0,
     });
 
@@ -105,6 +106,7 @@ describe("POST /orders", () => {
       price: 20,
       currency: "USD",
       version: 0,
+      userId: "123",
     });
 
     const response = await request(app)
@@ -125,6 +127,7 @@ describe("POST /orders", () => {
       price: 20,
       currency: "USD",
       version: 0,
+      userId: "123",
     });
 
     orderCreatePublish.mockRejectedValueOnce(new Error("BOOM!"));
@@ -150,6 +153,7 @@ describe("GET /orders", () => {
       price: 20,
       currency: "USD",
       version: 0,
+      userId: "123",
     });
 
     const postResponse = await request(app)
@@ -191,6 +195,7 @@ describe("GET /orders/:id", () => {
       price: 20,
       currency: "USD",
       version: 0,
+      userId: "123",
     });
 
     const postResponse = await request(app)
@@ -213,6 +218,7 @@ describe("GET /orders/:id", () => {
       price: 20,
       currency: "USD",
       version: 0,
+      userId: "123",
     });
 
     const postResponse = await request(app)
@@ -256,6 +262,7 @@ describe("PATCH /orders/:id", () => {
       price: 20,
       currency: "USD",
       version: 0,
+      userId: "123",
     });
 
     const postResponse = await request(app)
@@ -281,6 +288,7 @@ describe("PATCH /orders/:id", () => {
       price: 20,
       currency: "USD",
       version: 0,
+      userId: "123",
     });
 
     const postResponse = await request(app)
@@ -310,6 +318,7 @@ describe("PATCH /orders/:id", () => {
       price: 20,
       currency: "USD",
       version: 0,
+      userId: "123",
     });
 
     const postResponse = await request(app)

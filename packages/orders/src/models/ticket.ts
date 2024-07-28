@@ -7,6 +7,8 @@ type TicketDTO = {
   title: string;
   price: number;
   currency: string;
+  version: number;
+  userId: string;
 };
 
 interface TicketModel extends mongoose.Model<TicketDoc> {
@@ -19,6 +21,8 @@ interface TicketDoc extends mongoose.Document {
   currency: string;
   createdAt: Date;
   updatedAt: Date;
+  userId: string;
+  version: number;
   isReserved(): boolean;
 }
 
@@ -34,6 +38,14 @@ const ticketSchema = new mongoose.Schema(
     },
     currency: {
       type: String,
+      required: true,
+    },
+    userId: {
+      type: String,
+      required: true,
+    },
+    version: {
+      type: Number,
       required: true,
     },
   },
@@ -64,11 +76,15 @@ ticketSchema.methods.isReserved = async function isReserved() {
 };
 
 ticketSchema.statics.build = (payload: TicketDTO) => {
-  const ticket: Omit<TicketDTO, "id"> & { _id: string } = {
+  const ticket: Omit<TicketDTO, "id"> & {
+    _id: string;
+  } = {
     currency: payload.currency,
     price: payload.price,
     title: payload.title,
     _id: payload.id,
+    version: payload.version,
+    userId: payload.userId,
   };
   return new Ticket(ticket);
 };
