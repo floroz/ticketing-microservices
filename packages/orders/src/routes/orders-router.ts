@@ -10,8 +10,8 @@ import {
   UnauthorizedError,
   validateRequestMiddleware,
 } from "floroz-ticketing-common";
-import { Ticket } from "../models/ticket";
-import { Order } from "../models/order";
+import { Ticket } from "../models/ticket-model";
+import { Order } from "../models/order-model";
 import {
   OrderCancelledProducer,
   OrderCreatedProducer,

@@ -1,4 +1,4 @@
-import { Ticket } from "../ticket";
+import { Ticket } from "../ticket-model";
 import { it, expect } from "vitest";
 
 it("implements optimistic concurrency control", async () => {

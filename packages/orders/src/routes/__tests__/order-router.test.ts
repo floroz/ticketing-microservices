@@ -2,8 +2,8 @@ import { describe, expect, it, vi } from "vitest";
 import request from "supertest";
 import { app } from "../../app";
 import mongoose from "mongoose";
-import { Ticket } from "../../models/ticket";
-import { Order } from "../../models/order";
+import { Ticket } from "../../models/ticket-model";
+import { Order } from "../../models/order-model";
 import { OrderStatus } from "floroz-ticketing-common";
 
 vi.mock("floroz-ticketing-common", async () => ({

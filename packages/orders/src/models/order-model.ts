@@ -1,6 +1,6 @@
 import { OrderStatus } from "floroz-ticketing-common";
 import mongoose from "mongoose";
-import type { TicketDoc } from "./ticket";
+import type { TicketDoc } from "./ticket-model";
 
 type OrderCreationDTO = {
   ticket: TicketDoc;
@@ -43,6 +43,7 @@ const orderSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    optimisticConcurrency: true,
   }
 );
 

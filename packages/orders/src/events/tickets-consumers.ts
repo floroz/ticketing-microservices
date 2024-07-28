@@ -7,7 +7,7 @@ import {
   Topics,
 } from "floroz-ticketing-common";
 import { Message } from "node-nats-streaming";
-import { Ticket } from "../models/ticket";
+import { Ticket } from "../models/ticket-model";
 import { logger } from "../logger";
 
 const QUEUE_GROUP_NAME = "orders-service";
@@ -59,10 +59,9 @@ export class TicketUpdatedConsumer extends Consumer<TicketUpdatedEvent> {
     message: Message
   ): Promise<void> {
     try {
-      const ticket = await Ticket.findOne({
-        _id: data.id,
-        // prevent concurrency issues by checking the version
-        version: data.version - 1,
+      const ticket = await Ticket.findByEvent({
+        id: data.id,
+        version: data.version,
       });
 
       if (!ticket) {

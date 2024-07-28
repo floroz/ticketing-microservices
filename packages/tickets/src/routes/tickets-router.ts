@@ -17,7 +17,7 @@ import {
 import { NATS } from "floroz-ticketing-common";
 import { logger } from "../logger";
 import mongoose from "mongoose";
-import { Ticket } from "../models/ticket";
+import { Ticket } from "../models/ticket-model";
 
 const validationMiddleware = [
   body("title").not().isEmpty().isString().withMessage("Title is required"),

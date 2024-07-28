@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { Order } from "./order";
+import { Order } from "./order-model";
 import { OrderStatus } from "floroz-ticketing-common";
 
 type TicketDTO = {
@@ -13,6 +13,10 @@ type TicketDTO = {
 
 interface TicketModel extends mongoose.Model<TicketDoc> {
   build(ticket: TicketDTO): TicketDoc;
+  findByEvent(event: {
+    id: string;
+    version: number;
+  }): Promise<TicketDoc | null>;
 }
 
 interface TicketDoc extends mongoose.Document {
@@ -73,6 +77,16 @@ ticketSchema.methods.isReserved = async function isReserved() {
   });
 
   return !!existingOrder;
+};
+
+ticketSchema.statics.findByEvent = async function findByEvent(event: {
+  id: string;
+  version: number;
+}): Promise<TicketDoc | null> {
+  return Ticket.findOne({
+    _id: event.id,
+    version: event.version - 1,
+  });
 };
 
 ticketSchema.statics.build = (payload: TicketDTO) => {

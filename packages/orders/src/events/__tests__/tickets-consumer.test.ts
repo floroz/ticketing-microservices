@@ -8,7 +8,7 @@ import {
   TicketUpdatedEvent,
 } from "floroz-ticketing-common";
 import mongoose from "mongoose";
-import { Ticket } from "../../models/ticket";
+import { Ticket } from "../../models/ticket-model";
 
 describe("TicketCreatedConsumer", () => {
   it("should throw and not acknowledge the message when creating a ticket with a version of 0", async () => {
