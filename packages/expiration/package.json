@@ -14,7 +14,7 @@
     "dependencies": {
         "@types/bull": "^4.10.0",
         "bull": "^4.15.1",
-        "floroz-ticketing-common": "^1.0.50",
+        "floroz-ticketing-common": "^1.0.51",
         "node-nats-streaming": "^0.3.2",
         "pino": "^9.2.0",
         "ts-node-dev": "^2.0.0",
