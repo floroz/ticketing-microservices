@@ -90,3 +90,10 @@ export type OrderCancelledEvent = {
   };
   version: number;
 };
+
+export type OrderExpired = {
+  topic: Topics.OrderExpired;
+  data: {
+    id: string;
+  };
+};
