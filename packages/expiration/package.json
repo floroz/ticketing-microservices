@@ -1,16 +1,18 @@
 {
     "name": "@ticketing/expiration",
     "version": "1.0.0",
+    "main": "index.js",
     "description": "Expiration service for ticketing app",
     "scripts": {
-        "start": "ts-node-dev --respawn src/index.ts",
+        "start": "ts-node-dev --poll src/index.ts",
         "test": "vitest",
         "test:ci": "vitest run"
     },
     "devDependencies": {
-        "@types/node": "^20"
+        "@types/node": "^20.11.28"
     },
     "dependencies": {
+        "@types/bull": "^4.10.0",
         "bull": "^4.15.1",
         "floroz-ticketing-common": "^1.0.50",
         "node-nats-streaming": "^0.3.2",

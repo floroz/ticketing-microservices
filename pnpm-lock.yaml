@@ -28,6 +28,9 @@ importers:
       '@types/morgan':
         specifier: ^1.9.9
         version: 1.9.9
+      '@types/node':
+        specifier: ^20
+        version: 20.11.28
       bcrypt:
         specifier: ^5.1.1
         version: 5.1.1
@@ -91,7 +94,7 @@ importers:
         version: 18.2.0(react@18.2.0)
     devDependencies:
       '@types/node':
-        specifier: ^20
+        specifier: ^20.11.21
         version: 20.11.21
       '@types/react':
         specifier: ^18
@@ -129,6 +132,9 @@ importers:
       '@types/morgan':
         specifier: ^1.9.9
         version: 1.9.9
+      '@types/node':
+        specifier: ^20
+        version: 20.11.28
       bcrypt:
         specifier: ^5.1.1
         version: 5.1.1
@@ -184,6 +190,9 @@ importers:
 
   packages/expiration:
     dependencies:
+      '@types/bull':
+        specifier: ^4.10.0
+        version: 4.10.0
       bull:
         specifier: ^4.15.1
         version: 4.15.1
@@ -207,7 +216,7 @@ importers:
         version: 2.0.4(@types/node@20.11.28)
     devDependencies:
       '@types/node':
-        specifier: ^20
+        specifier: ^20.11.28
         version: 20.11.28
 
   packages/orders:
@@ -218,6 +227,9 @@ importers:
       '@types/express-validator':
         specifier: ^3.0.0
         version: 3.0.0
+      '@types/node':
+        specifier: ^20
+        version: 20.11.28
       cookie-session:
         specifier: ^2.1.0
         version: 2.1.0
@@ -300,6 +312,9 @@ importers:
       '@types/morgan':
         specifier: ^1.9.9
         version: 1.9.9
+      '@types/node':
+        specifier: ^20
+        version: 20.11.28
       bcrypt:
         specifier: ^5.1.1
         version: 5.1.1
@@ -1151,6 +1166,15 @@ packages:
     dependencies:
       '@types/connect': 3.4.38
       '@types/node': 20.11.28
+
+  /@types/bull@4.10.0:
+    resolution: {integrity: sha512-RkYW8K2H3J76HT6twmHYbzJ0GtLDDotpLP9ah9gtiA7zfF6peBH1l5fEiK0oeIZ3/642M7Jcb9sPmor8Vf4w6g==}
+    deprecated: This is a stub types definition. bull provides its own type definitions, so you do not need this installed.
+    dependencies:
+      bull: 4.15.1
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
 
   /@types/connect@3.4.38:
     resolution: {integrity: sha512-K6uROf1LD88uDQqJCktA4yzL1YYAK6NgfsI0v/mTgyPKWsX1CnJ0XPSDhViejru1GcRkLWb8RlzFYJRqGUbaug==}
