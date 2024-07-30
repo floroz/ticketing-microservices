@@ -23,13 +23,6 @@ spec:
                   key: JWT_SECRET
             - name: MONGO_URI
               value: 'mongodb://auth-mongo-srv:27017/auth?replicaSet=rs0'
-          resources:
-            requests:
-              memory: "128Mi"
-              cpu: "250m"
-            limits:
-              memory: "256Mi"
-              cpu: "500m"
 ---
 apiVersion: v1
 kind: Service

@@ -16,6 +16,8 @@ spec:
         - name: expiration
           image: floroz/expiration
           env:
+            - name: REDIS_URI
+              value: 'redis://expiration-redis-srv:6379'
             - name: NATS_URL
               value: 'http://nats-srv.default:4222'
             - name: NATS_CLUSTER_ID
@@ -24,24 +26,4 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-          resources:
-            requests:
-              memory: "64Mi"
-              cpu: "250m"
-            limits:
-              memory: "128Mi"
-              cpu: "500m"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: expiration-srv
-spec:
-  selector:
-    app: expiration
-  ports:
-    - name: expiration
-      protocol: TCP
-      port: 3001
-      targetPort: 3001
 
