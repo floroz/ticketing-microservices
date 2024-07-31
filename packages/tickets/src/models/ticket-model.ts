@@ -42,6 +42,7 @@ const ticketSchema = new mongoose.Schema(
     },
     linkedToOrderId: {
       type: mongoose.Schema.Types.ObjectId,
+      default: undefined,
     },
   },
   {

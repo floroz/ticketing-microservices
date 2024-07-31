@@ -21,7 +21,7 @@ export class OrderCreatedConsumer extends Consumer<OrderCreatedEvent> {
     const session = await mongoose.startSession();
 
     try {
-      logger.info(`${this.topic} event received with data`, data);
+      logger.info({ data }, `${this.topic} event received with data`);
 
       const ticket = await Ticket.findById(data.ticket.id);
 
@@ -32,7 +32,7 @@ export class OrderCreatedConsumer extends Consumer<OrderCreatedEvent> {
       }
 
       // link the order to the ticket - ticket is now reserved
-      ticket.set({ linkedToOrderId: data.id });
+      ticket.set("linkedToOrderId", data.id);
 
       await ticket.save({ session });
 
@@ -76,7 +76,7 @@ export class OrderCancelledConsumer extends Consumer<OrderCancelledEvent> {
         throw new NotFoundError();
       }
 
-      ticket.set({ linkedToOrderId: undefined });
+      ticket.set("linkedToOrderId", undefined);
 
       await ticket.save({ session });
 
@@ -96,7 +96,7 @@ export class OrderCancelledConsumer extends Consumer<OrderCancelledEvent> {
       message.ack();
     } catch (error) {
       await session.abortTransaction();
-      logger.error(`${this.topic} failed.`, error);
+      logger.error({ error }, `${this.topic} failed.`);
     } finally {
       session.endSession();
     }

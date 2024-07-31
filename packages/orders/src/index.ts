@@ -7,6 +7,7 @@ import {
   TicketDeletedConsumer,
   TicketUpdatedConsumer,
 } from "./events/tickets-consumers";
+import { OrderExpiredConsumer } from "./events/orders-consumers";
 
 const PORT = 3002;
 const clientId = process.env.NATS_CLIENT_ID;
@@ -33,10 +34,13 @@ const main = async () => {
   const ticketCreatedConsumer = new TicketCreatedConsumer(NATS.client);
   const ticketUpdatedConsumer = new TicketUpdatedConsumer(NATS.client);
   const ticketDeletedConsumer = new TicketDeletedConsumer(NATS.client);
+  const orderExpiredConsumer = new OrderExpiredConsumer(NATS.client);
 
   ticketCreatedConsumer.listen();
   ticketUpdatedConsumer.listen();
   ticketDeletedConsumer.listen();
+
+  orderExpiredConsumer.listen();
 
   NATS.client.on("close", () => {
     logger.info("NATS connection closed");

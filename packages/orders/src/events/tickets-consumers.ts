@@ -9,8 +9,7 @@ import {
 import { Message } from "node-nats-streaming";
 import { Ticket } from "../models/ticket-model";
 import { logger } from "../logger";
-
-const QUEUE_GROUP_NAME = "orders-service";
+import { QUEUE_GROUP_NAME } from "../constants";
 
 export class TicketCreatedConsumer extends Consumer<TicketCreatedEvent> {
   readonly queueGroup = QUEUE_GROUP_NAME;

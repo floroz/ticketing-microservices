@@ -91,9 +91,9 @@ router.post(
       });
       await order.save({ session });
 
-      const producer = new OrderCreatedProducer(NATS.client);
+      const orderCreatedProducer = new OrderCreatedProducer(NATS.client);
 
-      await producer.publish({
+      await orderCreatedProducer.publish({
         expiresAt: order.expiresAt.toISOString(),
         id: order.id,
         userId: req.currentUser?.id,

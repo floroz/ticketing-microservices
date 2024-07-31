@@ -141,11 +141,6 @@ router.put(
         return next(new NotFoundError());
       }
 
-      console.log({
-        userId,
-        ticketUserId: ticket.userId,
-      });
-
       // prevent updating if the user is not the owner of the ticket
       if (userId !== ticket?.userId) {
         return next(new ForbiddenError());
