@@ -91,7 +91,7 @@ export type OrderCancelledEvent = {
   version: number;
 };
 
-export type OrderExpired = {
+export type OrderExpiredEvent = {
   topic: Topics.OrderExpired;
   data: {
     id: string;
