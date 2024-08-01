@@ -102,17 +102,13 @@ class OrderCreatedConsumer extends Consumer<OrderCreatedEvent> {
     const currentTime = new Date();
     const remainingTime = expiresAtDate.getTime() - currentTime.getTime();
     const delay = remainingTime - EXPIRATION;
-    console.log("delay: ", delay / 1000);
     try {
       await expirationQueue.add(
         { orderId: data.id },
         {
           // in case the job arrives late, beyond the expiration time
           // we use max(0, delay) to avoid negative delay
-          // delay: Math.max(0, delay),
-
-          // debug
-          delay: 5000,
+          delay: Math.max(0, delay),
         }
       );
       logger.info(`Added job to queue with id ${data.id}`);
