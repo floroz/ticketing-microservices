@@ -3,7 +3,7 @@ import {
   Consumer,
   NATS,
   OrderCreatedEvent,
-  OrderExpired,
+  OrderExpiredEvent,
   Producer,
   Topics,
 } from "floroz-ticketing-common";
@@ -119,6 +119,6 @@ class OrderCreatedConsumer extends Consumer<OrderCreatedEvent> {
   }
 }
 
-class OrderExpiredProducer extends Producer<OrderExpired> {
+class OrderExpiredProducer extends Producer<OrderExpiredEvent> {
   readonly topic = Topics.OrderExpired;
 }

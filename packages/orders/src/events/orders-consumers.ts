@@ -1,5 +1,5 @@
 import {
-  OrderExpired,
+  OrderExpiredEvent,
   Consumer,
   Topics,
   NotFoundError,
@@ -13,11 +13,14 @@ import { logger } from "../logger";
 import { OrderCancelledProducer } from "./orders-producers";
 import mongoose from "mongoose";
 
-export class OrderExpiredConsumer extends Consumer<OrderExpired> {
+export class OrderExpiredConsumer extends Consumer<OrderExpiredEvent> {
   readonly topic = Topics.OrderExpired;
   readonly queueGroup = QUEUE_GROUP_NAME;
 
-  async onMessage(data: OrderExpired["data"], message: Message): Promise<void> {
+  async onMessage(
+    data: OrderExpiredEvent["data"],
+    message: Message
+  ): Promise<void> {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {

@@ -4,7 +4,7 @@ import {
   TicketUpdatedConsumer,
 } from "../tickets-consumers";
 import {
-  OrderExpired,
+  OrderExpiredEvent,
   OrderStatus,
   TicketCreatedEvent,
   TicketUpdatedEvent,
@@ -172,7 +172,7 @@ describe("OrderExpiredConsumer", () => {
   it("when no order exists, should acknowledge the message", async () => {
     const orderExpiredConsumer = new OrderExpiredConsumer({} as any);
 
-    const data: OrderExpired["data"] = {
+    const data: OrderExpiredEvent["data"] = {
       id: new mongoose.Types.ObjectId().toHexString(),
     };
 
@@ -187,7 +187,7 @@ describe("OrderExpiredConsumer", () => {
   it("when an order is already cancelled, it should acknowledge the message", async () => {
     const orderExpiredConsumer = new OrderExpiredConsumer({} as any);
 
-    const data: OrderExpired["data"] = {
+    const data: OrderExpiredEvent["data"] = {
       id: new mongoose.Types.ObjectId().toHexString(),
     };
 
@@ -241,7 +241,7 @@ describe("OrderExpiredConsumer", () => {
     });
     await order.save();
 
-    const data: OrderExpired["data"] = {
+    const data: OrderExpiredEvent["data"] = {
       id: order.id,
     };
 
@@ -274,7 +274,7 @@ describe("OrderExpiredConsumer", () => {
     });
     await order.save();
 
-    const data: OrderExpired["data"] = {
+    const data: OrderExpiredEvent["data"] = {
       id: order.id,
     };
 
@@ -313,7 +313,7 @@ describe("OrderExpiredConsumer", () => {
     });
     await order.save();
 
-    const data: OrderExpired["data"] = {
+    const data: OrderExpiredEvent["data"] = {
       id: order.id,
     };
 
