@@ -9,8 +9,11 @@ import {
 } from "floroz-ticketing-common";
 import { jwtService } from "./services/jwt";
 import { ordersRouter } from "./routes/orders-router";
+import helmet from "helmet";
 
 const app = express();
+
+app.use(helmet());
 
 app.use(morgan("dev"));
 
@@ -21,6 +24,7 @@ app.use(
   cookieSession({
     name: "session",
     signed: false,
+    sameSite: true,
     // secure: true,
   })
 );

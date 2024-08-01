@@ -9,9 +9,11 @@ import {
 } from "floroz-ticketing-common";
 import { ticketRouter } from "./routes/tickets-router";
 import { jwtService } from "./services/jwt";
+import helmet from "helmet";
 
 const app = express();
 
+app.use(helmet());
 app.use(morgan("dev"));
 
 // Trusting the ingress-nginx proxy
@@ -21,6 +23,7 @@ app.use(
   cookieSession({
     name: "session",
     signed: false,
+    sameSite: true,
     // secure: true,
   })
 );

@@ -46,6 +46,9 @@ importers:
       floroz-ticketing-common:
         specifier: 1.0.50
         version: 1.0.50(@types/node@20.11.28)
+      helmet:
+        specifier: ^7.1.0
+        version: 7.1.0
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
@@ -147,6 +150,9 @@ importers:
       express-validator:
         specifier: ^7.0.1
         version: 7.0.1
+      helmet:
+        specifier: ^7.1.0
+        version: 7.1.0
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
@@ -242,6 +248,9 @@ importers:
       floroz-ticketing-common:
         specifier: ^1.0.51
         version: 1.0.51
+      helmet:
+        specifier: ^7.1.0
+        version: 7.1.0
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
@@ -330,6 +339,9 @@ importers:
       floroz-ticketing-common:
         specifier: 1.0.50
         version: 1.0.50(@types/node@20.11.28)
+      helmet:
+        specifier: ^7.1.0
+        version: 7.1.0
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
@@ -3437,6 +3449,11 @@ packages:
     engines: {node: '>= 0.4'}
     dependencies:
       function-bind: 1.1.2
+
+  /helmet@7.1.0:
+    resolution: {integrity: sha512-g+HZqgfbpXdCkme/Cd/mZkV0aV3BZZZSugecH03kl38m/Kmdx8jKjBikpDj2cr+Iynv4KpYEviojNdTJActJAg==}
+    engines: {node: '>=16.0.0'}
+    dev: false
 
   /help-me@5.0.0:
     resolution: {integrity: sha512-7xgomUX6ADmcYzFik0HzAxh/73YlKR9bmFzf51CZwR+b6YtzU2m0u49hQCqV6SvlqIqsaxovfwdvbnsw3b/zpg==}
