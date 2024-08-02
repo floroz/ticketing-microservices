@@ -29,21 +29,28 @@ afterAll(async () => {
 
 declare global {
   var __get_cookie: (opts?: { randomize?: boolean }) => string[];
+  var __get_user_id: () => string;
 }
 
+const payload = {
+  email: "test@test.com",
+  id: "123123",
+};
+
+global.__get_user_id = () => payload.id;
+
 global.__get_cookie = ({ randomize } = { randomize: false }) => {
-  const payload = {
-    email: "test@test.com",
-    id: "123123",
+  const user = {
+    ...payload,
   };
 
   if (randomize) {
     const randomEmail = `${Math.random()}@test.com`;
-    payload.email = randomEmail;
-    payload.id = Math.random().toString(36).substring(7);
+    user.email = randomEmail;
+    user.id = Math.random().toString(36).substring(7);
   }
 
-  const token = jwt.sign(payload, process.env.JWT_SECRET!);
+  const token = jwt.sign(user, process.env.JWT_SECRET!);
 
   const session = { token };
 
