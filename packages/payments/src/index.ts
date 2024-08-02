@@ -18,6 +18,10 @@ if (!clientId || !clusterId || !url) {
   );
 }
 
+if (!process.env.STRIPE_SECRET) {
+  throw new Error("STRIPE_SECRET must be defined");
+}
+
 if (process.env.JWT_SECRET == null) {
   throw new Error("JWT_SECRET must be defined");
 } else {

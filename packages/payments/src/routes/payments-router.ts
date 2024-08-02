@@ -9,6 +9,7 @@ import {
   validateRequestMiddleware,
 } from "floroz-ticketing-common";
 import { body } from "express-validator";
+import Stripe from "stripe";
 
 const router = Router();
 
@@ -45,6 +46,8 @@ router.post(
       if (order.status === OrderStatus.Cancelled) {
         throw new ForbiddenError("Order is already cancelled.");
       }
+
+      const stripe = new Stripe(process.env.STRIPE_SECRET!);
 
       // validate token
 
