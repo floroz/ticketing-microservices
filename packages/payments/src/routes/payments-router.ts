@@ -3,14 +3,14 @@ import { logger } from "../logger";
 import { Order } from "../models/order-model";
 import {
   ForbiddenError,
+  GenericError,
   NotFoundError,
   OrderStatus,
   UnauthorizedError,
   validateRequestMiddleware,
 } from "floroz-ticketing-common";
 import { body } from "express-validator";
-import Stripe from "stripe";
-
+import { stripe } from "../services/stripe";
 const router = Router();
 
 router.post(
@@ -27,7 +27,7 @@ router.post(
     validateRequestMiddleware,
   ],
   async (req: Request, res: Response, next: NextFunction) => {
-    const { orderId } = req.body;
+    const { orderId, token } = req.body;
 
     try {
       const order = await Order.findById(orderId);
@@ -47,11 +47,20 @@ router.post(
         throw new ForbiddenError("Order is already cancelled.");
       }
 
-      const stripe = new Stripe(process.env.STRIPE_SECRET!);
-
-      // validate token
-
       // send request to STRIPE API
+      try {
+        await stripe.charges.create({
+          // TODO: add logic to handle ticket prices in different currencies
+          currency: order.tickets[0].currency,
+          amount:
+            order.tickets.reduce((acc, ticket) => acc + ticket.price, 0) * 100,
+          source: token,
+          description: `Payment for order ${order.id}`,
+        });
+      } catch (error) {
+        logger.error({ error }, "Error processing payment with Stripe");
+        return next(new GenericError("Error processing payment"));
+      }
 
       // create a transaction record
 
