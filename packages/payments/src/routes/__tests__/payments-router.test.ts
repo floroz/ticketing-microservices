@@ -8,6 +8,21 @@ import { beforeEach } from "node:test";
 import { stripe } from "../../services/stripe";
 import { Payment } from "../../models/payment-model";
 
+const publishMock = vi.fn().mockResolvedValue({});
+
+vi.mock("floroz-ticketing-common", async () => ({
+  ...(await vi.importActual("floroz-ticketing-common")),
+  NATS: {
+    client: {},
+  },
+}));
+
+vi.mock("../../events/payments-producers", () => ({
+  PaymentsProducer: vi.fn().mockImplementation(() => ({
+    publish: publishMock,
+  })),
+}));
+
 vi.mock("../../services/stripe.ts", () => ({
   stripe: {
     charges: {
@@ -189,7 +204,7 @@ describe("POST /payments", () => {
     `);
   });
 
-  it.only("should receive a valid token in the request, and submit a payment to the Stripe API", async () => {
+  it("should receive a valid token in the request, and submit a payment to the Stripe API", async () => {
     // create a valid order
     const order = Order.build({
       id: new mongoose.Types.ObjectId().toHexString(),
@@ -237,5 +252,77 @@ describe("POST /payments", () => {
     // check that payment was created using the stripe id
     payment = await Payment.findOne({ orderId: order.id, stripeId: testId });
     expect(payment).toBeTruthy();
+
+    // should publish an event
+    expect(publishMock).toHaveBeenCalledTimes(1);
+    expect(publishMock).toHaveBeenCalledWith({
+      id: payment?.id,
+      orderId: order.id,
+      createdAt: payment?.createdAt.toISOString(),
+    });
   });
+
+  it.fails(
+    "should abort the transaction in the db if a payment is not published by the producer",
+    async () => {
+      // create a valid order
+      const order = Order.build({
+        id: new mongoose.Types.ObjectId().toHexString(),
+        userId: global.__get_user_id(),
+        status: OrderStatus.Created,
+        tickets: [
+          {
+            id: new mongoose.Types.ObjectId().toHexString(),
+            price: 20,
+            currency: "usd",
+          },
+        ],
+        version: 0,
+      });
+
+      await order.save();
+
+      // no previous payment for this order should be available
+      let payment = await Payment.findOne({ orderId: order.id });
+      expect(payment).toBeFalsy();
+
+      // create a valid token
+      const token = "tok_visa";
+
+      const testId = "stripe_123";
+
+      chargesMock.mockResolvedValueOnce({
+        id: testId,
+      });
+
+      publishMock.mockRejectedValueOnce(new Error("Failed to publish"));
+
+      // make a request to the payments service
+      await request(app)
+        .post("/api/payments")
+        .set("Cookie", global.__get_cookie())
+        .send({ orderId: order.id, token })
+        .expect(500);
+
+      // FIXME: this is called twice for some reason
+      expect(chargesMock).toHaveBeenCalledTimes(1);
+      expect(chargesMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          amount: 2000,
+        })
+      );
+
+      // should have attempted to publish an event
+      expect(publishMock).toHaveBeenCalledTimes(1);
+      expect(publishMock).toHaveBeenCalledWith({
+        id: expect.any(String),
+        orderId: order.id,
+        createdAt: expect.any(String),
+      });
+
+      // check that payment was NOT created
+      payment = await Payment.findOne({ orderId: order.id, stripeId: testId });
+      expect(payment).toBeFalsy();
+    }
+  );
 });

@@ -3,7 +3,7 @@ import { logger } from "../logger";
 import { Order } from "../models/order-model";
 import {
   ForbiddenError,
-  GenericError,
+  NATS,
   NotFoundError,
   OrderStatus,
   UnauthorizedError,
@@ -12,6 +12,8 @@ import {
 import { body } from "express-validator";
 import { stripe } from "../services/stripe";
 import { Payment } from "../models/payment-model";
+import { PaymentsProducer } from "../events/payments-producers";
+import mongoose from "mongoose";
 const router = Router();
 
 router.post(
@@ -29,6 +31,10 @@ router.post(
   ],
   async (req: Request, res: Response, next: NextFunction) => {
     const { orderId, token } = req.body;
+
+    const session = await mongoose.startSession();
+
+    session.startTransaction();
 
     try {
       const order = await Order.findById(orderId);
@@ -49,35 +55,39 @@ router.post(
       }
 
       // send request to STRIPE API
-      try {
-        const response = await stripe.charges.create({
-          // TODO: add logic to handle ticket prices in different currencies
-          currency: order.tickets[0].currency,
-          amount:
-            order.tickets.reduce((acc, ticket) => acc + ticket.price, 0) * 100,
-          source: token,
-          description: `Payment for order ${order.id}`,
-        });
+      const response = await stripe.charges.create({
+        // TODO: add logic to handle ticket prices in different currencies
+        currency: order.tickets[0].currency,
+        amount:
+          order.tickets.reduce((acc, ticket) => acc + ticket.price, 0) * 100,
+        source: token,
+        description: `Payment for order ${order.id}`,
+      });
 
-        const payment = Payment.build({
-          orderId: order.id,
-          stripeId: response.id,
-        });
+      const payment = Payment.build({
+        orderId: order.id,
+        stripeId: response.id,
+      });
 
-        await payment.save();
-      } catch (error) {
-        logger.error({ error }, "Error processing payment with Stripe");
-        return next(new GenericError("Error processing payment"));
-      }
+      await payment.save({ session });
 
-      // TODO: publish a payment:created event
-      // that is used by order service to update the order status
-      // and from ticket service to update the ticket availability
+      const publisher = new PaymentsProducer(NATS.client);
 
-      res.status(201).send({ success: true });
+      await publisher.publish({
+        id: payment.id,
+        orderId: payment.orderId,
+        createdAt: payment.createdAt.toISOString(),
+      });
+
+      await session.commitTransaction();
+
+      res.status(201).send({});
     } catch (error) {
+      await session.abortTransaction();
       logger.error({ error }, "Error creating payment");
       next(error);
+    } finally {
+      session.endSession();
     }
   }
 );
