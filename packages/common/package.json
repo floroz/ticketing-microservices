@@ -1,6 +1,6 @@
 {
   "name": "floroz-ticketing-common",
-  "version": "1.0.52",
+  "version": "1.0.53",
   "description": "",
   "private": false,
   "main": "dist/index.js",
