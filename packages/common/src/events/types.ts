@@ -97,3 +97,12 @@ export type OrderExpiredEvent = {
     id: string;
   };
 };
+
+export type PaymentCreatedEvent = {
+  topic: Topics.PaymentCreated;
+  data: {
+    id: string;
+    orderId: string;
+    createdAt: string;
+  };
+};

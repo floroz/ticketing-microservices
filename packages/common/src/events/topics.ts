@@ -6,4 +6,5 @@ export enum Topics {
   OrderUpdated = "order:updated",
   OrderCancelled = "order:cancelled",
   OrderExpired = "order:expired",
+  PaymentCreated = "payment:created",
 }
