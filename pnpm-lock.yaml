@@ -44,8 +44,8 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1
       floroz-ticketing-common:
-        specifier: 1.0.52
-        version: 1.0.52
+        specifier: 1.0.53
+        version: 1.0.53
       helmet:
         specifier: ^7.1.0
         version: 7.1.0
@@ -203,8 +203,8 @@ importers:
         specifier: ^4.15.1
         version: 4.15.1
       floroz-ticketing-common:
-        specifier: ^1.0.52
-        version: 1.0.52
+        specifier: ^1.0.53
+        version: 1.0.53
       node-nats-streaming:
         specifier: ^0.3.2
         version: 0.3.2
@@ -246,8 +246,8 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1
       floroz-ticketing-common:
-        specifier: ^1.0.52
-        version: 1.0.52
+        specifier: ^1.0.53
+        version: 1.0.53
       helmet:
         specifier: ^7.1.0
         version: 7.1.0
@@ -322,8 +322,8 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1
       floroz-ticketing-common:
-        specifier: ^1.0.52
-        version: 1.0.52
+        specifier: ^1.0.53
+        version: 1.0.53
       helmet:
         specifier: ^7.1.0
         version: 7.1.0
@@ -416,8 +416,8 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1
       floroz-ticketing-common:
-        specifier: 1.0.52
-        version: 1.0.52
+        specifier: 1.0.53
+        version: 1.0.53
       helmet:
         specifier: ^7.1.0
         version: 7.1.0
@@ -3171,8 +3171,8 @@ packages:
     resolution: {integrity: sha512-X8cqMLLie7KsNUDSdzeN8FYK9rEt4Dt67OsG/DNGnYTSDBG4uFAJFBnUeiV+zCVAvwFy56IjM9sH51jVaEhNxw==}
     dev: true
 
-  /floroz-ticketing-common@1.0.52:
-    resolution: {integrity: sha512-63rE2zU/YSkhJ8iG1ETxa1KlXCpk5odtxJzk2r7A0EDH8q2hD/1V18qMOKSlwDC/GcsyKDMwE7ju8K057k+J6Q==}
+  /floroz-ticketing-common@1.0.53:
+    resolution: {integrity: sha512-nwiV40Q855LexEhaGO3ZChhw7OiV0jtDrIq1nq+UByjK6sKsNonW4XOsnMtbvLG/g8CBalVlav6+/e9sLEiScQ==}
     dependencies:
       '@types/bcrypt': 5.0.2
       '@types/cookie-session': 2.0.48
@@ -3191,8 +3191,8 @@ packages:
       morgan: 1.10.0
       node-nats-streaming: 0.3.2
       pino: 9.2.0
-      ts-node-dev: 2.0.0(@types/node@20.11.28)(typescript@5.5.4)
-      typescript: 5.5.4
+      ts-node-dev: 2.0.0(@types/node@20.11.28)(typescript@5.4.2)
+      typescript: 5.4.2
     transitivePeerDependencies:
       - '@aws-sdk/credential-providers'
       - '@mongodb-js/zstd'
