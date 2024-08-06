@@ -11,6 +11,7 @@ import {
 } from "floroz-ticketing-common";
 import { body } from "express-validator";
 import { stripe } from "../services/stripe";
+import { Payment } from "../models/payment-model";
 const router = Router();
 
 router.post(
@@ -49,7 +50,7 @@ router.post(
 
       // send request to STRIPE API
       try {
-        await stripe.charges.create({
+        const response = await stripe.charges.create({
           // TODO: add logic to handle ticket prices in different currencies
           currency: order.tickets[0].currency,
           amount:
@@ -57,12 +58,21 @@ router.post(
           source: token,
           description: `Payment for order ${order.id}`,
         });
+
+        const payment = Payment.build({
+          orderId: order.id,
+          stripeId: response.id,
+        });
+
+        await payment.save();
       } catch (error) {
         logger.error({ error }, "Error processing payment with Stripe");
         return next(new GenericError("Error processing payment"));
       }
 
-      // create a transaction record
+      // TODO: publish a payment:created event
+      // that is used by order service to update the order status
+      // and from ticket service to update the ticket availability
 
       res.status(201).send({ success: true });
     } catch (error) {

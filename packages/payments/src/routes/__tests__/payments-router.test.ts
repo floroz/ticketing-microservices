@@ -1,9 +1,26 @@
-import { expect, it, describe } from "vitest";
+import { expect, it, describe, vi, Mock } from "vitest";
 import { Order } from "../../models/order-model";
 import { OrderStatus } from "floroz-ticketing-common";
 import mongoose from "mongoose";
 import request from "supertest";
 import { app } from "../../app";
+import { beforeEach } from "node:test";
+import { stripe } from "../../services/stripe";
+import { Payment } from "../../models/payment-model";
+
+vi.mock("../../services/stripe.ts", () => ({
+  stripe: {
+    charges: {
+      create: vi.fn().mockResolvedValue({}),
+    },
+  },
+}));
+
+const chargesMock = stripe.charges.create as Mock;
+
+beforeEach(() => {
+  vi.clearAllMocks();
+});
 
 describe("POST /payments", () => {
   it("should return 400 for an empty payload", async () => {
@@ -87,7 +104,7 @@ describe("POST /payments", () => {
       .set("Cookie", global.__get_cookie())
       .send({
         orderId: new mongoose.Types.ObjectId().toHexString(),
-        token: "1234",
+        token: "tok_visa",
       })
       .expect(404);
 
@@ -124,7 +141,7 @@ describe("POST /payments", () => {
     const response = await request(app)
       .post("/api/payments")
       .set("Cookie", global.__get_cookie())
-      .send({ orderId: order.id, token: "123" })
+      .send({ orderId: order.id, token: "tok_visa" })
       .expect(401);
 
     expect(response.body.errors).toMatchInlineSnapshot(`
@@ -160,7 +177,7 @@ describe("POST /payments", () => {
     const response = await request(app)
       .post("/api/payments")
       .set("Cookie", global.__get_cookie())
-      .send({ orderId: order.id, token: "123" })
+      .send({ orderId: order.id, token: "tok_visa" })
       .expect(403);
 
     expect(response.body.errors).toMatchInlineSnapshot(`
@@ -172,7 +189,7 @@ describe("POST /payments", () => {
     `);
   });
 
-  it("should receive a valid token in the request, and submit a payment to the Stripe API", async () => {
+  it.only("should receive a valid token in the request, and submit a payment to the Stripe API", async () => {
     // create a valid order
     const order = Order.build({
       id: new mongoose.Types.ObjectId().toHexString(),
@@ -190,8 +207,18 @@ describe("POST /payments", () => {
 
     await order.save();
 
+    // no previous payment for this order should be available
+    let payment = await Payment.findOne({ orderId: order.id });
+    expect(payment).toBeFalsy();
+
     // create a valid token
     const token = "tok_visa";
+
+    const testId = "stripe_123";
+
+    chargesMock.mockResolvedValueOnce({
+      id: testId,
+    });
 
     // make a request to the payments service
     await request(app)
@@ -200,6 +227,15 @@ describe("POST /payments", () => {
       .send({ orderId: order.id, token })
       .expect(201);
 
-    // create a transaction record in the db
+    expect(chargesMock).toHaveBeenCalledTimes(1);
+    expect(chargesMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        amount: 2000,
+      })
+    );
+
+    // check that payment was created using the stripe id
+    payment = await Payment.findOne({ orderId: order.id, stripeId: testId });
+    expect(payment).toBeTruthy();
   });
 });
